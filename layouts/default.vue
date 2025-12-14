@@ -75,153 +75,161 @@
         <!-- Мобильное меню -->
         <Teleport to="body">
             <Transition name="mobile-menu">
-                <div v-if="isMobileMenuOpen" class="mobile-menu">
-                    <div class="mobile-menu-container">
-                        <div class="mobile-menu-header">
-                            <NuxtLink to="/" class="mobile-logo" @click="closeMobileMenu">
-                                <div class="mobile-logo-icon">
-                                    <svg viewBox="0 0 40 40" fill="none">
-                                        <rect x="0" y="0" width="40" height="40" fill="#f97316" />
-                                        <rect x="10" y="10" width="20" height="20" fill="white" />
+                <div v-if="isMobileMenuOpen" class="mobile-menu-wrapper">
+                    <!-- Убрано затемнение -->
+                    <div class="mobile-menu" @click.self="closeMobileMenu">
+                        <div class="mobile-menu-container">
+                            <div class="mobile-menu-header">
+                                <NuxtLink to="/" class="mobile-logo" @click="closeMobileMenu">
+                                    <div class="mobile-logo-icon">
+                                        <svg viewBox="0 0 40 40" fill="none">
+                                            <rect x="0" y="0" width="40" height="40" fill="#f97316" />
+                                            <rect x="10" y="10" width="20" height="20" fill="white" />
+                                        </svg>
+                                    </div>
+                                    <div class="mobile-logo-text">
+                                        <span class="logo-part-your">Твой</span>
+                                        <span class="logo-part-square">Квадрат</span>
+                                    </div>
+                                </NuxtLink>
+                                <button class="mobile-close" @click="closeMobileMenu" aria-label="Закрыть меню">
+                                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                                        <path d="M18 6L6 18" stroke="currentColor" stroke-width="2"
+                                            stroke-linecap="round" />
+                                        <path d="M6 6L18 18" stroke="currentColor" stroke-width="2"
+                                            stroke-linecap="round" />
                                     </svg>
-                                </div>
-                                <div class="mobile-logo-text">
-                                    <span class="logo-part-your">Твой</span>
-                                    <span class="logo-part-square">Квадрат</span>
-                                </div>
-                            </NuxtLink>
-                            <button class="mobile-close" @click="closeMobileMenu" aria-label="Закрыть меню">
-                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-                                    <path d="M18 6L6 18" stroke="currentColor" stroke-width="2"
-                                        stroke-linecap="round" />
-                                    <path d="M6 6L18 18" stroke="currentColor" stroke-width="2"
-                                        stroke-linecap="round" />
-                                </svg>
-                            </button>
-                        </div>
+                                </button>
+                            </div>
 
-                        <div class="mobile-menu-content">
-                            <nav class="mobile-nav">
-                                <div class="mobile-nav-section">
-                                    <div class="mobile-nav-item" v-for="item in menuItems" :key="item.id">
-                                        <button class="mobile-nav-button" @click="toggleMobileSubmenu(item.id)"
-                                            :aria-expanded="activeMobileSubmenu === item.id">
-                                            <span class="mobile-nav-button-text">{{ item.title }}</span>
-                                            <svg class="mobile-nav-arrow"
-                                                :class="{ 'rotated': activeMobileSubmenu === item.id }" width="20"
-                                                height="20" viewBox="0 0 24 24" fill="none">
-                                                <path d="M6 9L12 15L18 9" stroke="currentColor" stroke-width="2"
-                                                    stroke-linecap="round" stroke-linejoin="round" />
-                                            </svg>
-                                        </button>
+                            <div class="mobile-menu-content">
+                                <nav class="mobile-nav">
+                                    <div class="mobile-nav-section">
+                                        <div class="mobile-nav-item" v-for="item in menuItems" :key="item.id">
+                                            <button class="mobile-nav-button" @click="toggleMobileSubmenu(item.id)"
+                                                :aria-expanded="activeMobileSubmenu === item.id">
+                                                <span class="mobile-nav-button-text">{{ item.title }}</span>
+                                                <svg class="mobile-nav-arrow"
+                                                    :class="{ 'rotated': activeMobileSubmenu === item.id }" width="20"
+                                                    height="20" viewBox="0 0 24 24" fill="none">
+                                                    <path d="M6 9L12 15L18 9" stroke="currentColor" stroke-width="2"
+                                                        stroke-linecap="round" stroke-linejoin="round" />
+                                                </svg>
+                                            </button>
 
-                                        <Transition name="slide-down">
-                                            <div v-if="activeMobileSubmenu === item.id" class="mobile-submenu">
-                                                <div class="mobile-submenu-content">
-                                                    <div v-for="section in item.sections" :key="section.title"
-                                                        class="mobile-submenu-section">
-                                                        <h5 class="mobile-submenu-title">{{ section.title }}</h5>
-                                                        <div class="mobile-submenu-links">
-                                                            <NuxtLink v-for="link in section.links" :key="link.name"
-                                                                :to="link.path" class="mobile-submenu-link"
-                                                                @click="closeMobileMenu">
-                                                                <div class="mobile-submenu-link-icon">
-                                                                    <svg width="24" height="24" viewBox="0 0 24 24"
-                                                                        fill="none">
-                                                                        <circle cx="12" cy="12" r="10" stroke="#f97316"
-                                                                            stroke-width="2" />
-                                                                        <path d="M8 12L11 15L16 9" stroke="#f97316"
-                                                                            stroke-width="2" stroke-linecap="round" />
+                                            <Transition name="slide-down">
+                                                <div v-if="activeMobileSubmenu === item.id" class="mobile-submenu">
+                                                    <div class="mobile-submenu-content">
+                                                        <div v-for="section in item.sections" :key="section.title"
+                                                            class="mobile-submenu-section">
+                                                            <h5 class="mobile-submenu-title">{{ section.title }}</h5>
+                                                            <div class="mobile-submenu-links">
+                                                                <NuxtLink v-for="link in section.links" :key="link.name"
+                                                                    :to="link.path" class="mobile-submenu-link"
+                                                                    @click="closeMobileMenu">
+                                                                    <div class="mobile-submenu-link-icon">
+                                                                        <svg width="24" height="24" viewBox="0 0 24 24"
+                                                                            fill="none">
+                                                                            <circle cx="12" cy="12" r="10"
+                                                                                stroke="#f97316" stroke-width="2" />
+                                                                            <path d="M8 12L11 15L16 9" stroke="#f97316"
+                                                                                stroke-width="2"
+                                                                                stroke-linecap="round" />
+                                                                        </svg>
+                                                                    </div>
+                                                                    <div class="mobile-submenu-link-content">
+                                                                        <span class="mobile-submenu-link-title">{{
+                                                                            link.name
+                                                                        }}</span>
+                                                                        <span class="mobile-submenu-link-description"
+                                                                            v-if="link.description">
+                                                                            {{ link.description }}
+                                                                        </span>
+                                                                    </div>
+                                                                    <svg class="mobile-submenu-link-arrow" width="16"
+                                                                        height="16" viewBox="0 0 16 16" fill="none">
+                                                                        <path d="M4 8H12M12 8L8 4M12 8L8 12"
+                                                                            stroke="currentColor" stroke-width="1.5"
+                                                                            stroke-linecap="round"
+                                                                            stroke-linejoin="round" />
                                                                     </svg>
-                                                                </div>
-                                                                <div class="mobile-submenu-link-content">
-                                                                    <span class="mobile-submenu-link-title">{{ link.name
-                                                                    }}</span>
-                                                                    <span class="mobile-submenu-link-description"
-                                                                        v-if="link.description">
-                                                                        {{ link.description }}
-                                                                    </span>
-                                                                </div>
-                                                                <svg class="mobile-submenu-link-arrow" width="16"
-                                                                    height="16" viewBox="0 0 16 16" fill="none">
-                                                                    <path d="M4 8H12M12 8L8 4M12 8L8 12"
-                                                                        stroke="currentColor" stroke-width="1.5"
-                                                                        stroke-linecap="round"
-                                                                        stroke-linejoin="round" />
-                                                                </svg>
-                                                            </NuxtLink>
+                                                                </NuxtLink>
+                                                            </div>
                                                         </div>
                                                     </div>
                                                 </div>
-                                            </div>
-                                        </Transition>
+                                            </Transition>
+                                        </div>
                                     </div>
-                                </div>
-                            </nav>
+                                </nav>
 
-                            <div class="mobile-actions">
-                                <div class="mobile-auth">
-                                    <p class="mobile-auth-title">Уже есть аккаунт?</p>
-                                    <NuxtLink to="/login" class="mobile-auth-button" @click="closeMobileMenu">
-                                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none"
-                                            class="mobile-auth-icon">
-                                            <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4M10 17l5-5-5-5M15 12H3"
-                                                stroke="currentColor" stroke-width="2" stroke-linecap="round"
-                                                stroke-linejoin="round" />
-                                        </svg>
-                                        <span>Войти в систему</span>
-                                    </NuxtLink>
-                                </div>
-
-                                <div class="mobile-footer">
-                                    <div class="mobile-contacts">
-                                        <a href="tel:+78001234567" class="mobile-contact-link">
-                                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+                                <div class="mobile-actions">
+                                    <div class="mobile-auth">
+                                        <p class="mobile-auth-title">Уже есть аккаунт?</p>
+                                        <NuxtLink to="/login" class="mobile-auth-button" @click="closeMobileMenu">
+                                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none"
+                                                class="mobile-auth-icon">
                                                 <path
-                                                    d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07 19.5 19.5 0 01-6-6 19.79 19.79 0 01-3.07-8.67A2 2 0 014.11 2h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L8.09 9.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 16.92z"
+                                                    d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4M10 17l5-5-5-5M15 12H3"
                                                     stroke="currentColor" stroke-width="2" stroke-linecap="round"
                                                     stroke-linejoin="round" />
                                             </svg>
-                                            <span>8 (800) 123-45-67</span>
-                                        </a>
-                                        <a href="mailto:info@yoursquare.ru" class="mobile-contact-link">
-                                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
-                                                <path
-                                                    d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"
-                                                    stroke="currentColor" stroke-width="2" stroke-linecap="round"
-                                                    stroke-linejoin="round" />
-                                                <path d="M22 6l-10 7L2 6" stroke="currentColor" stroke-width="2"
-                                                    stroke-linecap="round" stroke-linejoin="round" />
-                                            </svg>
-                                            <span>info@yoursquare.ru</span>
-                                        </a>
+                                            <span>Войти в систему</span>
+                                        </NuxtLink>
                                     </div>
 
-                                    <div class="mobile-social">
-                                        <a href="#" class="mobile-social-link" aria-label="Telegram">
-                                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
-                                                <path d="M21 5L2 12.5L9 13.5M21 5L15 21L9 13.5M21 5L9 13.5"
-                                                    stroke="currentColor" stroke-width="2" stroke-linecap="round"
-                                                    stroke-linejoin="round" />
-                                            </svg>
-                                        </a>
-                                        <a href="#" class="mobile-social-link" aria-label="VK">
-                                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
-                                                <path d="M18 2h-3a5 5 0 00-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 011-1h3z"
-                                                    stroke="currentColor" stroke-width="2" stroke-linecap="round"
-                                                    stroke-linejoin="round" />
-                                            </svg>
-                                        </a>
-                                        <a href="#" class="mobile-social-link" aria-label="YouTube">
-                                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
-                                                <path
-                                                    d="M22.54 6.42a2.78 2.78 0 00-1.94-2C18.88 4 12 4 12 4s-6.88 0-8.6.46a2.78 2.78 0 00-1.94 2A29 29 0 001 11.75a29 29 0 00.46 5.33A2.78 2.78 0 003.4 19c1.72.46 8.6.46 8.6.46s6.88 0 8.6-.46a2.78 2.78 0 001.94-2 29 29 0 00.46-5.25 29 29 0 00-.46-5.33z"
-                                                    stroke="currentColor" stroke-width="2" stroke-linecap="round"
-                                                    stroke-linejoin="round" />
-                                                <path d="M9.75 15.02l5.75-3.27-5.75-3.27v6.54z" stroke="currentColor"
-                                                    stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
-                                            </svg>
-                                        </a>
+                                    <div class="mobile-footer">
+                                        <div class="mobile-contacts">
+                                            <a href="tel:+78001234567" class="mobile-contact-link">
+                                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+                                                    <path
+                                                        d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07 19.5 19.5 0 01-6-6 19.79 19.79 0 01-3.07-8.67A2 2 0 014.11 2h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L8.09 9.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 16.92z"
+                                                        stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                                        stroke-linejoin="round" />
+                                                </svg>
+                                                <span>8 (800) 123-45-67</span>
+                                            </a>
+                                            <a href="mailto:info@yoursquare.ru" class="mobile-contact-link">
+                                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+                                                    <path
+                                                        d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"
+                                                        stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                                        stroke-linejoin="round" />
+                                                    <path d="M22 6l-10 7L2 6" stroke="currentColor" stroke-width="2"
+                                                        stroke-linecap="round" stroke-linejoin="round" />
+                                                </svg>
+                                                <span>info@yoursquare.ru</span>
+                                            </a>
+                                        </div>
+
+                                        <div class="mobile-social">
+                                            <a href="#" class="mobile-social-link" aria-label="Telegram">
+                                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+                                                    <path d="M21 5L2 12.5L9 13.5M21 5L15 21L9 13.5M21 5L9 13.5"
+                                                        stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                                        stroke-linejoin="round" />
+                                                </svg>
+                                            </a>
+                                            <a href="#" class="mobile-social-link" aria-label="VK">
+                                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+                                                    <path
+                                                        d="M18 2h-3a5 5 0 00-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 011-1h3z"
+                                                        stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                                        stroke-linejoin="round" />
+                                                </svg>
+                                            </a>
+                                            <a href="#" class="mobile-social-link" aria-label="YouTube">
+                                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+                                                    <path
+                                                        d="M22.54 6.42a2.78 2.78 0 00-1.94-2C18.88 4 12 4 12 4s-6.88 0-8.6.46a2.78 2.78 0 00-1.94 2A29 29 0 001 11.75a29 29 0 00.46 5.33A2.78 2.78 0 003.4 19c1.72.46 8.6.46 8.6.46s6.88 0 8.6-.46a2.78 2.78 0 001.94-2 29 29 0 00.46-5.25 29 29 0 00-.46-5.33z"
+                                                        stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                                        stroke-linejoin="round" />
+                                                    <path d="M9.75 15.02l5.75-3.27-5.75-3.27v6.54z"
+                                                        stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                                        stroke-linejoin="round" />
+                                                </svg>
+                                            </a>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -230,11 +238,6 @@
                 </div>
             </Transition>
         </Teleport>
-
-        <!-- Оверлей для мобильного меню -->
-        <Transition name="fade">
-            <div v-if="isMobileMenuOpen" class="mobile-overlay" @click="closeMobileMenu"></div>
-        </Transition>
     </header>
     <main>
         <slot />
@@ -789,26 +792,24 @@ onUnmounted(() => {
     transform: rotate(-45deg) translate(7px, -7px);
 }
 
-/* Мобильное меню */
-.mobile-overlay {
+/* Мобильное меню - БЕЛОЕ И БЕЗ ЗАТЕМНЕНИЯ */
+.mobile-menu-wrapper {
     position: fixed;
     top: 0;
     left: 0;
     right: 0;
     bottom: 0;
-    background: rgba(0, 0, 0, 0.5);
-    z-index: 999;
+    z-index: 9999;
 }
 
 .mobile-menu {
-    position: fixed;
+    position: absolute;
     top: 0;
     right: 0;
     bottom: 0;
     width: 100%;
     max-width: 420px;
     background: #ffffff;
-    z-index: 1000;
     display: flex;
     flex-direction: column;
     overflow: hidden;
@@ -819,6 +820,8 @@ onUnmounted(() => {
     display: flex;
     flex-direction: column;
     height: 100%;
+    background: #ffffff;
+    /* Белый фон всегда */
 }
 
 .mobile-menu-header {
@@ -839,6 +842,7 @@ onUnmounted(() => {
     font-size: 1.5rem;
     font-weight: 700;
     color: #111827;
+    /* Черный цвет текста всегда */
 }
 
 .mobile-logo-icon {
@@ -856,10 +860,12 @@ onUnmounted(() => {
 
 .mobile-logo-text .logo-part-your {
     color: #111827;
+    /* Черный цвет всегда */
 }
 
 .mobile-logo-text .logo-part-square {
     color: #111827;
+    /* Черный цвет всегда */
 }
 
 .mobile-close {
@@ -868,6 +874,7 @@ onUnmounted(() => {
     padding: 0.5rem;
     cursor: pointer;
     color: #64748b;
+    /* Серый цвет всегда */
     display: flex;
     align-items: center;
     justify-content: center;
@@ -890,6 +897,8 @@ onUnmounted(() => {
     overflow-y: auto;
     padding: 1.5rem;
     padding-bottom: 2rem;
+    background: #ffffff;
+    /* Белый фон всегда */
 }
 
 .mobile-nav {
@@ -917,6 +926,7 @@ onUnmounted(() => {
     font-size: 1rem;
     font-weight: 600;
     color: #1e293b;
+    /* Темный цвет текста всегда */
     cursor: pointer;
     border-radius: 10px;
     transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
@@ -935,11 +945,13 @@ onUnmounted(() => {
     transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
     flex-shrink: 0;
     color: #64748b;
+    /* Серый цвет всегда */
 }
 
 .mobile-nav-arrow.rotated {
     transform: rotate(180deg);
     color: #f97316;
+    /* Оранжевый при открытии */
 }
 
 /* Мобильное подменю */
@@ -967,6 +979,7 @@ onUnmounted(() => {
     font-size: 0.75rem;
     font-weight: 600;
     color: #64748b;
+    /* Серый цвет всегда */
     text-transform: uppercase;
     letter-spacing: 0.05em;
     margin: 0 0 0.75rem 0;
@@ -985,6 +998,7 @@ onUnmounted(() => {
     gap: 0.75rem;
     padding: 0.875rem 1rem;
     color: #334155;
+    /* Темный цвет всегда */
     text-decoration: none;
     border-radius: 10px;
     transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
@@ -999,6 +1013,7 @@ onUnmounted(() => {
 .mobile-submenu-link-icon {
     flex-shrink: 0;
     color: #f97316;
+    /* Оранжевый всегда */
     display: flex;
     align-items: center;
     justify-content: center;
@@ -1015,17 +1030,20 @@ onUnmounted(() => {
     font-weight: 600;
     font-size: 0.95rem;
     color: #1e293b;
+    /* Темный цвет всегда */
 }
 
 .mobile-submenu-link-description {
     font-size: 0.75rem;
     color: #64748b;
+    /* Серый цвет всегда */
     line-height: 1.4;
 }
 
 .mobile-submenu-link-arrow {
     flex-shrink: 0;
     color: #cbd5e1;
+    /* Светло-серый всегда */
     transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
@@ -1042,6 +1060,8 @@ onUnmounted(() => {
     display: flex;
     flex-direction: column;
     gap: 2rem;
+    background: #ffffff;
+    /* Белый фон всегда */
 }
 
 .mobile-auth {
@@ -1053,6 +1073,7 @@ onUnmounted(() => {
 .mobile-auth-title {
     font-size: 0.875rem;
     color: #64748b;
+    /* Серый цвет всегда */
     text-align: center;
     margin: 0;
 }
@@ -1099,6 +1120,7 @@ onUnmounted(() => {
     align-items: center;
     gap: 0.75rem;
     color: #475569;
+    /* Серый цвет всегда */
     text-decoration: none;
     font-size: 0.875rem;
     transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
@@ -1122,6 +1144,7 @@ onUnmounted(() => {
     width: 40px;
     height: 40px;
     color: #475569;
+    /* Серый цвет всегда */
     border-radius: 10px;
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
@@ -1133,35 +1156,47 @@ onUnmounted(() => {
 }
 
 /* УЛУЧШЕННЫЕ АНИМАЦИИ */
-/* Анимация мобильного меню */
-.mobile-menu-enter-active {
-    transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
-}
-
+/* Анимация мобильного меню - ПЛАВНАЯ ВЕРСИЯ */
+.mobile-menu-enter-active,
 .mobile-menu-leave-active {
-    transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-.mobile-menu-enter-from {
+.mobile-menu-enter-from .mobile-menu,
+.mobile-menu-leave-to .mobile-menu {
     transform: translateX(100%);
+    opacity: 0;
 }
 
-.mobile-menu-enter-to {
+.mobile-menu-enter-to .mobile-menu,
+.mobile-menu-leave-from .mobile-menu {
     transform: translateX(0);
+    opacity: 1;
 }
 
-.mobile-menu-leave-from {
-    transform: translateX(0);
+/* Плавная анимация самого меню */
+.mobile-menu {
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    width: 100%;
+    max-width: 420px;
+    background: #ffffff;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    box-shadow: -4px 0 24px rgba(0, 0, 0, 0.1);
+    transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1),
+        opacity 0.3s ease;
+    will-change: transform;
+    /* Улучшает производительность анимации */
 }
 
-.mobile-menu-leave-to {
-    transform: translateX(100%);
-}
-
-/* Анимация подменю в мобильном меню */
+/* Улучшенная анимация подменю в мобильном меню */
 .slide-down-enter-active,
 .slide-down-leave-active {
-    transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
     overflow: hidden;
 }
 
@@ -1179,15 +1214,84 @@ onUnmounted(() => {
     transform: translateY(0);
 }
 
-/* Анимация оверлея */
-.fade-enter-active,
-.fade-leave-active {
-    transition: opacity 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+/* Анимация иконок в мобильном меню */
+.mobile-close {
+    transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
-.fade-enter-from,
-.fade-leave-to {
-    opacity: 0;
+.mobile-nav-arrow {
+    transition: transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+/* Плавная анимация кнопок в мобильном меню */
+.mobile-nav-button,
+.mobile-submenu-link,
+.mobile-auth-button,
+.mobile-contact-link,
+.mobile-social-link {
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Плавное появление контента внутри мобильного меню */
+.mobile-menu-content {
+    animation: fadeInContent 0.6s cubic-bezier(0.4, 0, 0.2, 1) 0.2s both;
+}
+
+@keyframes fadeInContent {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Плавная анимация для отдельных секций */
+.mobile-nav-section,
+.mobile-actions {
+    animation: slideUpFade 0.5s cubic-bezier(0.4, 0, 0.2, 1) both;
+}
+
+.mobile-nav-section {
+    animation-delay: 0.1s;
+}
+
+.mobile-actions {
+    animation-delay: 0.2s;
+}
+
+@keyframes slideUpFade {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Плавное исчезновение при закрытии */
+.mobile-menu-leave-active .mobile-menu-content,
+.mobile-menu-leave-active .mobile-nav-section,
+.mobile-menu-leave-active .mobile-actions {
+    animation: fadeOutContent 0.3s ease both;
+}
+
+@keyframes fadeOutContent {
+    to {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+}
+
+/* Улучшенная анимация для кнопки меню */
+.mobile-menu-toggle .bar {
+    transition: all 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
 }
 
 /* Добавляем отступ для контента под фиксированной шапкой */
