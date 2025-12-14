@@ -952,7 +952,4 @@ const popularProducts = ref([
 }
 
 /* Telegram секция */
-
-
-
 </style>

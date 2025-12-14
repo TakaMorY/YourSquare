@@ -140,7 +140,7 @@
                                                                     <div class="mobile-submenu-link-content">
                                                                         <span class="mobile-submenu-link-title">{{
                                                                             link.name
-                                                                        }}</span>
+                                                                            }}</span>
                                                                         <span class="mobile-submenu-link-description"
                                                                             v-if="link.description">
                                                                             {{ link.description }}
@@ -463,13 +463,13 @@ onUnmounted(() => {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 1rem 2rem;
+    padding: 1rem 1.5rem;
     position: relative;
     z-index: 10;
-    gap: 2rem;
+    gap: 1rem;
 }
 
-/* Логотип */
+/* Логотип - НЕИЗМЕННЫЙ НА ВСЕХ УСТРОЙСТВАХ */
 .logo {
     display: flex;
     align-items: center;
@@ -480,6 +480,8 @@ onUnmounted(() => {
     transition: color 0.3s ease;
     color: #000;
     white-space: nowrap;
+    flex-shrink: 0;
+    min-width: fit-content;
 }
 
 .scrolled .logo {
@@ -492,6 +494,7 @@ onUnmounted(() => {
     display: flex;
     align-items: center;
     justify-content: center;
+    flex-shrink: 0;
 }
 
 .logo-icon svg {
@@ -517,6 +520,7 @@ onUnmounted(() => {
 .logo-text {
     display: flex;
     gap: 0.25rem;
+    flex-shrink: 0;
 }
 
 .logo-part {
@@ -714,13 +718,14 @@ onUnmounted(() => {
 .header-actions {
     display: flex;
     align-items: center;
-    gap: 1rem;
+    gap: 0.75rem;
     margin-left: auto;
+    flex-shrink: 0;
 }
 
 .auth-link {
     display: none;
-    padding: 0.625rem 1.5rem;
+    padding: 0.625rem 1.25rem;
     text-decoration: none;
     font-weight: 500;
     border-radius: 0.5rem;
@@ -774,6 +779,7 @@ onUnmounted(() => {
     align-items: center;
     justify-content: center;
     transition: opacity 0.2s ease;
+    flex-shrink: 0;
 }
 
 @media (min-width: 768px) {
@@ -807,7 +813,7 @@ onUnmounted(() => {
     transform: rotate(-45deg) translate(7px, -7px);
 }
 
-/* Мобильное меню - БЕЛОЕ И БЕЗ ЗАТЕМНЕНИЯ */
+/* Мобильное меню */
 .mobile-menu-wrapper {
     position: fixed;
     top: 0;
@@ -836,7 +842,6 @@ onUnmounted(() => {
     flex-direction: column;
     height: 100%;
     background: #ffffff;
-    /* Белый фон всегда */
 }
 
 .mobile-menu-header {
@@ -857,7 +862,6 @@ onUnmounted(() => {
     font-size: 1.5rem;
     font-weight: 700;
     color: #111827;
-    /* Черный цвет текста всегда */
 }
 
 .mobile-logo-icon {
@@ -875,12 +879,10 @@ onUnmounted(() => {
 
 .mobile-logo-text .logo-part-your {
     color: #111827;
-    /* Черный цвет всегда */
 }
 
 .mobile-logo-text .logo-part-square {
     color: #111827;
-    /* Черный цвет всегда */
 }
 
 .mobile-close {
@@ -889,7 +891,6 @@ onUnmounted(() => {
     padding: 0.5rem;
     cursor: pointer;
     color: #64748b;
-    /* Серый цвет всегда */
     display: flex;
     align-items: center;
     justify-content: center;
@@ -913,7 +914,6 @@ onUnmounted(() => {
     padding: 1.5rem;
     padding-bottom: 2rem;
     background: #ffffff;
-    /* Белый фон всегда */
 }
 
 .mobile-nav {
@@ -941,7 +941,6 @@ onUnmounted(() => {
     font-size: 1rem;
     font-weight: 600;
     color: #1e293b;
-    /* Темный цвет текста всегда */
     cursor: pointer;
     border-radius: 10px;
     transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
@@ -960,13 +959,11 @@ onUnmounted(() => {
     transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
     flex-shrink: 0;
     color: #64748b;
-    /* Серый цвет всегда */
 }
 
 .mobile-nav-arrow.rotated {
     transform: rotate(180deg);
     color: #f97316;
-    /* Оранжевый при открытии */
 }
 
 /* Мобильное подменю */
@@ -994,7 +991,6 @@ onUnmounted(() => {
     font-size: 0.75rem;
     font-weight: 600;
     color: #64748b;
-    /* Серый цвет всегда */
     text-transform: uppercase;
     letter-spacing: 0.05em;
     margin: 0 0 0.75rem 0;
@@ -1013,7 +1009,6 @@ onUnmounted(() => {
     gap: 0.75rem;
     padding: 0.875rem 1rem;
     color: #334155;
-    /* Темный цвет всегда */
     text-decoration: none;
     border-radius: 10px;
     transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
@@ -1028,7 +1023,6 @@ onUnmounted(() => {
 .mobile-submenu-link-icon {
     flex-shrink: 0;
     color: #f97316;
-    /* Оранжевый всегда */
     display: flex;
     align-items: center;
     justify-content: center;
@@ -1045,20 +1039,17 @@ onUnmounted(() => {
     font-weight: 600;
     font-size: 0.95rem;
     color: #1e293b;
-    /* Темный цвет всегда */
 }
 
 .mobile-submenu-link-description {
     font-size: 0.75rem;
     color: #64748b;
-    /* Серый цвет всегда */
     line-height: 1.4;
 }
 
 .mobile-submenu-link-arrow {
     flex-shrink: 0;
     color: #cbd5e1;
-    /* Светло-серый всегда */
     transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
@@ -1076,7 +1067,6 @@ onUnmounted(() => {
     flex-direction: column;
     gap: 2rem;
     background: #ffffff;
-    /* Белый фон всегда */
 }
 
 .mobile-auth {
@@ -1088,7 +1078,6 @@ onUnmounted(() => {
 .mobile-auth-title {
     font-size: 0.875rem;
     color: #64748b;
-    /* Серый цвет всегда */
     text-align: center;
     margin: 0;
 }
@@ -1135,7 +1124,6 @@ onUnmounted(() => {
     align-items: center;
     gap: 0.75rem;
     color: #475569;
-    /* Серый цвет всегда */
     text-decoration: none;
     font-size: 0.875rem;
     transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
@@ -1159,7 +1147,6 @@ onUnmounted(() => {
     width: 40px;
     height: 40px;
     color: #475569;
-    /* Серый цвет всегда */
     border-radius: 10px;
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
@@ -1171,7 +1158,7 @@ onUnmounted(() => {
 }
 
 /* УЛУЧШЕННЫЕ АНИМАЦИИ */
-/* Анимация мобильного меню - ПЛАВНАЯ ВЕРСИЯ */
+/* Анимация мобильного меню */
 .mobile-menu-enter-active,
 .mobile-menu-leave-active {
     transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
@@ -1205,7 +1192,6 @@ onUnmounted(() => {
     transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1),
         opacity 0.3s ease;
     will-change: transform;
-    /* Улучшает производительность анимации */
 }
 
 /* Улучшенная анимация подменю в мобильном меню */
@@ -1229,24 +1215,6 @@ onUnmounted(() => {
     transform: translateY(0);
 }
 
-/* Анимация иконок в мобильном меню */
-.mobile-close {
-    transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
-}
-
-.mobile-nav-arrow {
-    transition: transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
-}
-
-/* Плавная анимация кнопок в мобильном меню */
-.mobile-nav-button,
-.mobile-submenu-link,
-.mobile-auth-button,
-.mobile-contact-link,
-.mobile-social-link {
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
 /* Плавное появление контента внутри мобильного меню */
 .mobile-menu-content {
     animation: fadeInContent 0.6s cubic-bezier(0.4, 0, 0.2, 1) 0.2s both;
@@ -1264,57 +1232,7 @@ onUnmounted(() => {
     }
 }
 
-/* Плавная анимация для отдельных секций */
-.mobile-nav-section,
-.mobile-actions {
-    animation: slideUpFade 0.5s cubic-bezier(0.4, 0, 0.2, 1) both;
-}
-
-.mobile-nav-section {
-    animation-delay: 0.1s;
-}
-
-.mobile-actions {
-    animation-delay: 0.2s;
-}
-
-@keyframes slideUpFade {
-    from {
-        opacity: 0;
-        transform: translateY(20px);
-    }
-
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
-
-/* Плавное исчезновение при закрытии */
-.mobile-menu-leave-active .mobile-menu-content,
-.mobile-menu-leave-active .mobile-nav-section,
-.mobile-menu-leave-active .mobile-actions {
-    animation: fadeOutContent 0.3s ease both;
-}
-
-@keyframes fadeOutContent {
-    to {
-        opacity: 0;
-        transform: translateY(10px);
-    }
-}
-
-/* Улучшенная анимация для кнопки меню */
-.mobile-menu-toggle .bar {
-    transition: all 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
-}
-
-/* Добавляем отступ для контента под фиксированной шапкой */
-.site-header+* {
-    margin-top: 6rem;
-}
-
-/* Исправление для мобильных устройств */
+/* АДАПТИВНЫЕ СТИЛИ БЕЗ ИЗМЕНЕНИЙ ЛОГОТИПА */
 @media (max-width: 767px) {
     .site-header {
         width: calc(100% - 1rem);
@@ -1323,14 +1241,40 @@ onUnmounted(() => {
 
     .header-container {
         padding: 0.75rem 1rem;
-        gap: 1.5rem;
+        gap: 0.75rem;
     }
 
-    .mobile-menu {
-        max-width: 100%;
+    /* Уменьшаем только кнопку "Войти" на мобильных, если она видна */
+    .auth-link {
+        padding: 0.5rem 1rem;
+        font-size: 0.875rem;
     }
 }
 
+/* Гарантируем, что логотип всегда виден на маленьких экранах */
+@media (max-width: 480px) {
+    .logo {
+        flex-shrink: 0;
+    }
+
+    /* Уменьшаем отступы для большего пространства */
+    .header-container {
+        padding: 0.5rem 0.75rem;
+    }
+}
+
+/* Обеспечиваем минимальную ширину для логотипа */
+.logo {
+    min-width: 140px;
+    /* Минимальная ширина для "ТвойКвадрат" */
+}
+
+/* Добавляем отступ для контента под фиксированной шапкой */
+.site-header+* {
+    margin-top: 6rem;
+}
+
+/* Исправление для очень маленьких мобильных устройств */
 @media (max-width: 480px) {
     .mobile-menu {
         max-width: 100%;
@@ -1338,6 +1282,11 @@ onUnmounted(() => {
 
     .mobile-submenu-content {
         padding-left: 1rem;
+    }
+
+    /* Убедимся, что логотип не обрезается */
+    .logo {
+        overflow: visible;
     }
 }
 </style>
