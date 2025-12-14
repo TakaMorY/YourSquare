@@ -136,7 +136,7 @@
                                                                 </div>
                                                                 <div class="mobile-submenu-link-content">
                                                                     <span class="mobile-submenu-link-title">{{ link.name
-                                                                        }}</span>
+                                                                    }}</span>
                                                                     <span class="mobile-submenu-link-description"
                                                                         v-if="link.description">
                                                                         {{ link.description }}
@@ -569,7 +569,7 @@ onUnmounted(() => {
 }
 
 .nav-arrow {
-    transition: transform 0.2s ease;
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     flex-shrink: 0;
 }
 
@@ -590,7 +590,7 @@ onUnmounted(() => {
         0 25px 50px -12px rgba(0, 0, 0, 0.25),
         0 0 0 1px rgba(0, 0, 0, 0.05);
     overflow: hidden;
-    animation: slideDown 0.2s ease;
+    animation: slideDown 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     z-index: 1001;
 }
 
@@ -604,7 +604,7 @@ onUnmounted(() => {
 @keyframes slideDown {
     from {
         opacity: 0;
-        transform: translateY(-10px);
+        transform: translateY(-12px);
     }
 
     to {
@@ -652,7 +652,7 @@ onUnmounted(() => {
     padding: 0.75rem;
     text-decoration: none;
     border-radius: 0.75rem;
-    transition: all 0.2s ease;
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .submenu-link:hover {
@@ -706,7 +706,7 @@ onUnmounted(() => {
     text-decoration: none;
     font-weight: 500;
     border-radius: 0.5rem;
-    transition: all 0.3s ease;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     white-space: nowrap;
 
     background: white;
@@ -755,6 +755,7 @@ onUnmounted(() => {
     height: 40px;
     align-items: center;
     justify-content: center;
+    transition: opacity 0.2s ease;
 }
 
 @media (min-width: 768px) {
@@ -767,7 +768,7 @@ onUnmounted(() => {
     width: 24px;
     height: 2px;
     background: #000;
-    transition: all 0.3s ease;
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
     transform-origin: center;
 }
 
@@ -781,6 +782,7 @@ onUnmounted(() => {
 
 .mobile-menu-toggle.active .bar:nth-child(2) {
     opacity: 0;
+    transform: scaleX(0);
 }
 
 .mobile-menu-toggle.active .bar:nth-child(3) {
@@ -794,9 +796,7 @@ onUnmounted(() => {
     left: 0;
     right: 0;
     bottom: 0;
-    background: rgba(0, 0, 0, 0.7);
-    backdrop-filter: blur(8px);
-    -webkit-backdrop-filter: blur(8px);
+    background: rgba(0, 0, 0, 0.5);
     z-index: 999;
 }
 
@@ -812,7 +812,7 @@ onUnmounted(() => {
     display: flex;
     flex-direction: column;
     overflow: hidden;
-    box-shadow: -4px 0 24px rgba(0, 0, 0, 0.15);
+    box-shadow: -4px 0 24px rgba(0, 0, 0, 0.1);
 }
 
 .mobile-menu-container {
@@ -874,12 +874,13 @@ onUnmounted(() => {
     width: 40px;
     height: 40px;
     border-radius: 8px;
-    transition: all 0.2s ease;
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .mobile-close:hover {
     background: #f8fafc;
     color: #334155;
+    transform: rotate(90deg);
 }
 
 .mobile-menu-content {
@@ -918,7 +919,7 @@ onUnmounted(() => {
     color: #1e293b;
     cursor: pointer;
     border-radius: 10px;
-    transition: all 0.2s ease;
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
     text-align: left;
 }
 
@@ -931,7 +932,7 @@ onUnmounted(() => {
 }
 
 .mobile-nav-arrow {
-    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
     flex-shrink: 0;
     color: #64748b;
 }
@@ -986,7 +987,7 @@ onUnmounted(() => {
     color: #334155;
     text-decoration: none;
     border-radius: 10px;
-    transition: all 0.2s ease;
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
     position: relative;
 }
 
@@ -1025,12 +1026,12 @@ onUnmounted(() => {
 .mobile-submenu-link-arrow {
     flex-shrink: 0;
     color: #cbd5e1;
-    transition: transform 0.2s ease;
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .mobile-submenu-link:hover .mobile-submenu-link-arrow {
     color: #94a3b8;
-    transform: translateX(2px);
+    transform: translateX(3px);
 }
 
 /* Мобильные действия */
@@ -1067,14 +1068,14 @@ onUnmounted(() => {
     text-decoration: none;
     font-weight: 600;
     border-radius: 12px;
-    transition: all 0.3s ease;
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
     box-shadow: 0 4px 12px rgba(249, 115, 22, 0.2);
 }
 
 .mobile-auth-button:hover {
     background: linear-gradient(135deg, #ea580c, #c2410c);
     transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba(249, 115, 22, 0.3);
+    box-shadow: 0 8px 20px rgba(249, 115, 22, 0.3);
 }
 
 .mobile-auth-icon {
@@ -1100,11 +1101,12 @@ onUnmounted(() => {
     color: #475569;
     text-decoration: none;
     font-size: 0.875rem;
-    transition: color 0.2s ease;
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .mobile-contact-link:hover {
     color: #f97316;
+    transform: translateX(2px);
 }
 
 .mobile-social {
@@ -1121,34 +1123,45 @@ onUnmounted(() => {
     height: 40px;
     color: #475569;
     border-radius: 10px;
-    transition: all 0.2s ease;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .mobile-social-link:hover {
     color: #f97316;
     background: #fff7ed;
-    transform: translateY(-2px);
+    transform: translateY(-3px) scale(1.1);
 }
 
-/* Анимации */
-.mobile-menu-enter-active,
+/* УЛУЧШЕННЫЕ АНИМАЦИИ */
+/* Анимация мобильного меню */
+.mobile-menu-enter-active {
+    transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
 .mobile-menu-leave-active {
     transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-.mobile-menu-enter-from,
-.mobile-menu-leave-to {
+.mobile-menu-enter-from {
     transform: translateX(100%);
 }
 
-.mobile-menu-enter-to,
+.mobile-menu-enter-to {
+    transform: translateX(0);
+}
+
 .mobile-menu-leave-from {
     transform: translateX(0);
 }
 
+.mobile-menu-leave-to {
+    transform: translateX(100%);
+}
+
+/* Анимация подменю в мобильном меню */
 .slide-down-enter-active,
 .slide-down-leave-active {
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
     overflow: hidden;
 }
 
@@ -1156,7 +1169,7 @@ onUnmounted(() => {
 .slide-down-leave-to {
     max-height: 0;
     opacity: 0;
-    transform: translateY(-10px);
+    transform: translateY(-8px);
 }
 
 .slide-down-enter-to,
@@ -1166,9 +1179,10 @@ onUnmounted(() => {
     transform: translateY(0);
 }
 
+/* Анимация оверлея */
 .fade-enter-active,
 .fade-leave-active {
-    transition: opacity 0.3s ease;
+    transition: opacity 0.4s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .fade-enter-from,
