@@ -219,26 +219,7 @@
                     </div>
 
                     <!-- Статистика -->
-                    <div class="bg-white rounded-xl shadow-lg p-6">
-                        <h3 class="text-xl font-bold text-gray-900 mb-6">Статистика</h3>
-                        <div class="space-y-4">
-                            <div class="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
-                                <span class="text-gray-700">Дней в системе</span>
-                                <span class="font-bold text-orange-600">{{ daysInSystem }}</span>
-                            </div>
-                            <div class="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
-                                <span class="text-gray-700">Статус аккаунта</span>
-                                <span class="font-bold text-green-600">Активен</span>
-                            </div>
-                            <div class="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
-                                <span class="text-gray-700">Email подтвержден</span>
-                                <span class="font-bold"
-                                    :class="user.email_confirmed_at ? 'text-green-600' : 'text-red-600'">
-                                    {{ user.email_confirmed_at ? 'Да' : 'Нет' }}
-                                </span>
-                            </div>
-                        </div>
-                    </div>
+
 
                     <!-- Действия -->
                     <div class="bg-white rounded-xl shadow-lg p-6">
