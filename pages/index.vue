@@ -5,7 +5,7 @@
             <div class="hero-container">
                 <div class="hero-content">
                     <div class="hero-badge">
-                        <span class="badge-text">Твой город, твои правила</span>
+                        <span class="badge-text">Твой Владивосток, твои правила</span>
                         <div class="badge-line"></div>
                     </div>
                     <h1 class="hero-title">
@@ -14,12 +14,12 @@
                         <span class="title-line">в городе</span>
                     </h1>
                     <p class="hero-subtitle">
-                        Единая платформа для всего, что нужно подростку в твоём городе:
+                        Единая платформа для всего, что нужно подростку в нашем городе:
                         места, активности, люди и вещи — всё в одном месте.
                     </p>
                     <div class="hero-actions">
-                        <NuxtLink to="/explore" class="btn btn-primary">
-                            <span>Начать исследовать</span>
+                        <NuxtLink to="/" class="btn btn-primary">
+                            <span to="">Начать исследовать город</span>
                             <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
                                 <path d="M13.75 6.75L19.25 12L13.75 17.25" stroke="currentColor" stroke-width="2"
                                     stroke-linecap="round" stroke-linejoin="round" />
@@ -187,8 +187,19 @@
 
 <script setup>
 import { ref } from 'vue'
-import AboutForum from '~/companents/index/AboutForum.vue'
-import PopularNow from '~/companents/index/PopularNow.vue'
+import AboutForum from '~/components/index/AboutForum.vue'
+import PopularNow from '~/components/index/PopularNow.vue'
+// Добавьте этот импорт в существующий скрипт
+import { useSupabaseUser } from '#imports'
+
+const user = useSupabaseUser()
+
+// Добавьте функцию выхода
+const handleLogout = async () => {
+    const supabase = useSupabaseClient()
+    await supabase.auth.signOut()
+    closeMobileMenu() // если меню открыто
+}
 
 
 const activeTab = ref('places')
