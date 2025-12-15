@@ -169,93 +169,7 @@
 
         <!-- Секция "Популярное сейчас" -->
         <section class="popular-now">
-            <div class="section-container">
-                <div class="section-header">
-                    <h2 class="section-title">Популярное <span class="accent">сейчас</span></h2>
-                    <div class="section-tabs">
-                        <button class="tab-btn active" @click="activeTab = 'places'">Места</button>
-                        <button class="tab-btn" @click="activeTab = 'activities'">Активности</button>
-                        <button class="tab-btn" @click="activeTab = 'market'">Товары</button>
-                    </div>
-                </div>
-
-                <div class="tab-content">
-                    <!-- Места -->
-                    <div v-if="activeTab === 'places'" class="places-grid">
-                        <div class="place-card" v-for="place in popularPlaces" :key="place.id">
-                            <div class="place-image">
-                                <img :src="place.image" :alt="place.name">
-                                <span class="place-category">{{ place.category }}</span>
-                            </div>
-                            <div class="place-content">
-                                <h3>{{ place.name }}</h3>
-                                <p class="place-description">{{ place.description }}</p>
-                                <div class="place-meta">
-                                    <span class="place-price">{{ place.price }}</span>
-                                    <span class="place-rating">
-                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
-                                            <path
-                                                d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z"
-                                                fill="#fbbf24" stroke="#fbbf24" />
-                                        </svg>
-                                        {{ place.rating }}
-                                    </span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Активности -->
-                    <div v-if="activeTab === 'activities'" class="activities-list">
-                        <div class="activity-card" v-for="activity in popularActivities" :key="activity.id">
-                            <div class="activity-type">
-                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-                                    <circle cx="12" cy="12" r="10" stroke="#f97316" stroke-width="2" />
-                                    <path d="M16 12L10 16V8L16 12Z" fill="#f97316" />
-                                </svg>
-                                <span>{{ activity.type }}</span>
-                            </div>
-                            <div class="activity-content">
-                                <h3>{{ activity.title }}</h3>
-                                <p>{{ activity.description }}</p>
-                                <div class="activity-meta">
-                                    <span>{{ activity.participants }}/{{ activity.maxParticipants }}</span>
-                                    <span>·</span>
-                                    <span>{{ activity.date }}</span>
-                                </div>
-                            </div>
-                            <button class="activity-join" :disabled="activity.participants >= activity.maxParticipants">
-                                {{ activity.participants >= activity.maxParticipants ? 'Мест нет' : 'Присоединиться' }}
-                            </button>
-                        </div>
-                    </div>
-
-                    <!-- Товары -->
-                    <div v-if="activeTab === 'market'" class="market-grid">
-                        <div class="product-card" v-for="product in popularProducts" :key="product.id">
-                            <div class="product-image">
-                                <img :src="product.image" :alt="product.title">
-                                <span class="product-price">{{ product.price }} ₽</span>
-                            </div>
-                            <div class="product-content">
-                                <h3>{{ product.title }}</h3>
-                                <p class="product-description">{{ product.description }}</p>
-                                <div class="product-seller">
-                                    <span>{{ product.seller }}</span>
-                                    <span class="seller-rating">
-                                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
-                                            <path
-                                                d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z"
-                                                fill="#fbbf24" />
-                                        </svg>
-                                        {{ product.rating }}
-                                    </span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
+            <PopularNow />
         </section>
 
 
@@ -274,6 +188,7 @@
 <script setup>
 import { ref } from 'vue'
 import AboutForum from '~/companents/index/AboutForum.vue'
+import PopularNow from '~/companents/index/PopularNow.vue'
 
 
 const activeTab = ref('places')

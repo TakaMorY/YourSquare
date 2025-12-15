@@ -247,11 +247,11 @@
             <div class="mt-16 pt-6 border-t border-zinc-800">
                 <div class="flex flex-col md:flex-row md:items-center md:justify-between">
                     <div class="flex space-x-6 mb-4 md:mb-0">
-                        <a href="#" class="text-xs text-gray-500 hover:text-gray-300">Sitemap</a>
-                        <a href="#" class="text-xs text-gray-500 hover:text-gray-300">Privacy Policy</a>
+                        <NuxtLink to="/privacy" class="text-xs text-gray-500 hover:text-gray-300">Политика конфедициальности
+                        </NuxtLink>
                     </div>
                     <div class="text-xs text-gray-500">
-                        © 2025, Site. All Rights Reserved.
+                        © 2025, Твой Квадрат. Все права защищены.
                     </div>
                 </div>
             </div>
@@ -278,21 +278,20 @@ const menuItems = ref([
         title: 'Продукты',
         sections: [
             {
-                title: 'Основные решения',
+                title: 'Основные направления',
                 links: [
-                    { name: 'Корпоративная платформа', description: 'Все в одном решении', path: '/platform' },
-                    { name: 'Бизнес-аналитика', description: 'Подробные отчеты и метрики', path: '/analytics' },
-                    { name: 'Автоматизация маркетинга', description: 'Умные кампании', path: '/marketing' },
-                    { name: 'Управление проектами', description: 'Командная работа', path: '/projects' }
+                    { name: 'Карта мест', description: 'Все на одной карте', path: '/platform' },
+                    { name: 'Форум', description: 'Место для обсуждения', path: '/forum' },
+                    { name: 'Барахолка квадрата', description: 'Найти то, что нужно именно тебе', path: '/market' },
+                    { name: '"Найдись"', description: 'Найди команду или человека', path: '/projects' }
                 ]
             },
             {
                 title: 'Специализированные',
                 links: [
-                    { name: 'Мобильные приложения', description: 'iOS и Android', path: '/mobile' },
-                    { name: 'Разработчикам API', description: 'Интеграции и расширения', path: '/api' },
-                    { name: 'Безопасность', description: 'Защита данных', path: '/security' },
-                    { name: 'Облачные решения', description: 'Масштабируемая инфраструктура', path: '/cloud' }
+                    { name: 'Мобильные приложения', description: 'iOS и Android', path: '/projects' },
+                    { name: 'Разработчикам API', description: 'Интеграции и расширения', path: 'projects/api' },
+                    { name: 'Заказ сайта', description: 'Создадим сайт под заказ', path: '/projects' }
                 ]
             }
         ]
@@ -304,10 +303,10 @@ const menuItems = ref([
             {
                 title: 'По отраслям',
                 links: [
-                    { name: 'Финансы и банкинг', path: '/finance' },
-                    { name: 'Розничная торговля', path: '/retail' },
-                    { name: 'Здравоохранение', path: '/healthcare' },
-                    { name: 'Образование', path: '/education' }
+                    { name: 'Заказ сайта', path: '/projects' },
+                    { name: 'Розничная торговля', path: '/projects' },
+                    { name: 'Здравоохранение', path: '/projects' },
+                    { name: 'Образование', path: '/projects' }
                 ]
             }
         ]
@@ -334,10 +333,10 @@ const menuItems = ref([
             {
                 title: 'О нас',
                 links: [
-                    { name: 'Наша команда', path: '/team' },
-                    { name: 'Карьера', path: '/careers' },
-                    { name: 'Партнеры', path: '/partners' },
-                    { name: 'Контакты', path: '/contacts' }
+                    { name: 'Наша команда', path: '/company/team' },
+                    { name: 'Карьера', path: '/company/team' },
+                    { name: 'Партнёрство', path: '/partners' },
+                    { name: 'Контакты', path: '/company/team' }
                 ]
             }
         ]
@@ -433,19 +432,29 @@ onUnmounted(() => {
 </script>
 
 <style scoped>
+/* Основные исправления для предотвращения горизонтального скролла */
+html,
+body {
+    overflow-x: hidden;
+    max-width: 100vw;
+    width: 100%;
+}
+
 .site-header {
     position: fixed;
     top: 1.5rem;
-    left: 50%;
-    transform: translateX(-50%);
-    width: calc(100% - 3rem);
-    max-width: 64rem;
+    left: 0;
+    right: 0;
     z-index: 1000;
     transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1);
     background: rgba(255, 255, 255, 0.95);
     backdrop-filter: blur(10px);
-    border-bottom: 1px solid #e5e7eb;
+   
     border-radius: 12px;
+    margin: 0 auto;
+    max-width: 64rem;
+    width: calc(100% - 3rem);
+    box-sizing: border-box;
 }
 
 .site-header.scrolled {
@@ -467,6 +476,8 @@ onUnmounted(() => {
     position: relative;
     z-index: 10;
     gap: 1rem;
+    max-width: 100%;
+    box-sizing: border-box;
 }
 
 /* Логотип - НЕИЗМЕННЫЙ НА ВСЕХ УСТРОЙСТВАХ */
@@ -640,12 +651,15 @@ onUnmounted(() => {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
     gap: 2rem;
+    max-width: 100%;
+    box-sizing: border-box;
 }
 
 .submenu-section {
     display: flex;
     flex-direction: column;
     gap: 1rem;
+    max-width: 100%;
 }
 
 .submenu-title {
@@ -675,6 +689,7 @@ onUnmounted(() => {
     text-decoration: none;
     border-radius: 0.75rem;
     transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    max-width: 100%;
 }
 
 .submenu-link:hover {
@@ -731,11 +746,12 @@ onUnmounted(() => {
     border-radius: 0.5rem;
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     white-space: nowrap;
-
     background: white;
     color: #4b5563;
     border: 1px solid #e5e7eb;
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    max-width: 100%;
+    box-sizing: border-box;
 }
 
 .auth-link:hover {
@@ -821,6 +837,8 @@ onUnmounted(() => {
     right: 0;
     bottom: 0;
     z-index: 9999;
+    width: 100vw;
+    overflow: hidden;
 }
 
 .mobile-menu {
@@ -842,6 +860,8 @@ onUnmounted(() => {
     flex-direction: column;
     height: 100%;
     background: #ffffff;
+    max-width: 100%;
+    box-sizing: border-box;
 }
 
 .mobile-menu-header {
@@ -852,6 +872,7 @@ onUnmounted(() => {
     border-bottom: 1px solid #f1f5f9;
     background: #fff;
     flex-shrink: 0;
+    max-width: 100%;
 }
 
 .mobile-logo {
@@ -862,6 +883,8 @@ onUnmounted(() => {
     font-size: 1.5rem;
     font-weight: 700;
     color: #111827;
+    max-width: 100%;
+    flex-shrink: 1;
 }
 
 .mobile-logo-icon {
@@ -870,19 +893,26 @@ onUnmounted(() => {
     display: flex;
     align-items: center;
     justify-content: center;
+    flex-shrink: 0;
 }
 
 .mobile-logo-text {
     display: flex;
     gap: 0.25rem;
+    flex-shrink: 1;
+    min-width: 0;
 }
 
 .mobile-logo-text .logo-part-your {
     color: #111827;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .mobile-logo-text .logo-part-square {
     color: #111827;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .mobile-close {
@@ -898,6 +928,7 @@ onUnmounted(() => {
     height: 40px;
     border-radius: 8px;
     transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    flex-shrink: 0;
 }
 
 .mobile-close:hover {
@@ -914,21 +945,26 @@ onUnmounted(() => {
     padding: 1.5rem;
     padding-bottom: 2rem;
     background: #ffffff;
+    max-width: 100%;
+    box-sizing: border-box;
 }
 
 .mobile-nav {
     flex: 1;
+    max-width: 100%;
 }
 
 .mobile-nav-section {
     display: flex;
     flex-direction: column;
     gap: 0.5rem;
+    max-width: 100%;
 }
 
 .mobile-nav-item {
     display: flex;
     flex-direction: column;
+    max-width: 100%;
 }
 
 .mobile-nav-button {
@@ -945,6 +981,8 @@ onUnmounted(() => {
     border-radius: 10px;
     transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
     text-align: left;
+    width: 100%;
+    box-sizing: border-box;
 }
 
 .mobile-nav-button:hover {
@@ -953,6 +991,10 @@ onUnmounted(() => {
 
 .mobile-nav-button-text {
     flex: 1;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 }
 
 .mobile-nav-arrow {
@@ -971,16 +1013,20 @@ onUnmounted(() => {
     overflow: hidden;
     margin-top: 0.25rem;
     margin-bottom: 0.75rem;
+    max-width: 100%;
 }
 
 .mobile-submenu-content {
     padding-left: 1.5rem;
     border-left: 2px solid #f1f5f9;
     margin-left: 0.5rem;
+    max-width: 100%;
+    box-sizing: border-box;
 }
 
 .mobile-submenu-section {
     margin-bottom: 1.5rem;
+    max-width: 100%;
 }
 
 .mobile-submenu-section:last-child {
@@ -995,12 +1041,16 @@ onUnmounted(() => {
     letter-spacing: 0.05em;
     margin: 0 0 0.75rem 0;
     padding-left: 0.5rem;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 }
 
 .mobile-submenu-links {
     display: flex;
     flex-direction: column;
     gap: 0.5rem;
+    max-width: 100%;
 }
 
 .mobile-submenu-link {
@@ -1013,6 +1063,8 @@ onUnmounted(() => {
     border-radius: 10px;
     transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
     position: relative;
+    max-width: 100%;
+    box-sizing: border-box;
 }
 
 .mobile-submenu-link:hover {
@@ -1033,18 +1085,27 @@ onUnmounted(() => {
     display: flex;
     flex-direction: column;
     gap: 0.125rem;
+    min-width: 0;
 }
 
 .mobile-submenu-link-title {
     font-weight: 600;
     font-size: 0.95rem;
     color: #1e293b;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 }
 
 .mobile-submenu-link-description {
     font-size: 0.75rem;
     color: #64748b;
     line-height: 1.4;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
 }
 
 .mobile-submenu-link-arrow {
@@ -1067,12 +1128,14 @@ onUnmounted(() => {
     flex-direction: column;
     gap: 2rem;
     background: #ffffff;
+    max-width: 100%;
 }
 
 .mobile-auth {
     display: flex;
     flex-direction: column;
     gap: 1rem;
+    max-width: 100%;
 }
 
 .mobile-auth-title {
@@ -1095,6 +1158,8 @@ onUnmounted(() => {
     border-radius: 12px;
     transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
     box-shadow: 0 4px 12px rgba(249, 115, 22, 0.2);
+    max-width: 100%;
+    box-sizing: border-box;
 }
 
 .mobile-auth-button:hover {
@@ -1111,12 +1176,14 @@ onUnmounted(() => {
     display: flex;
     flex-direction: column;
     gap: 1.5rem;
+    max-width: 100%;
 }
 
 .mobile-contacts {
     display: flex;
     flex-direction: column;
     gap: 0.75rem;
+    max-width: 100%;
 }
 
 .mobile-contact-link {
@@ -1127,6 +1194,14 @@ onUnmounted(() => {
     text-decoration: none;
     font-size: 0.875rem;
     transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    max-width: 100%;
+    min-width: 0;
+}
+
+.mobile-contact-link span {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 }
 
 .mobile-contact-link:hover {
@@ -1138,6 +1213,8 @@ onUnmounted(() => {
     display: flex;
     gap: 1rem;
     justify-content: center;
+    flex-wrap: wrap;
+    max-width: 100%;
 }
 
 .mobile-social-link {
@@ -1149,6 +1226,7 @@ onUnmounted(() => {
     color: #475569;
     border-radius: 10px;
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    flex-shrink: 0;
 }
 
 .mobile-social-link:hover {
@@ -1232,11 +1310,15 @@ onUnmounted(() => {
     }
 }
 
-/* АДАПТИВНЫЕ СТИЛИ БЕЗ ИЗМЕНЕНИЙ ЛОГОТИПА */
+/* АДАПТИВНЫЕ СТИЛИ */
 @media (max-width: 767px) {
     .site-header {
         width: calc(100% - 1rem);
         top: 0.5rem;
+        max-width: none;
+        left: 0.5rem;
+        right: 0.5rem;
+        margin: 0;
     }
 
     .header-container {
@@ -1254,28 +1336,24 @@ onUnmounted(() => {
 /* Гарантируем, что логотип всегда виден на маленьких экранах */
 @media (max-width: 480px) {
     .logo {
-        flex-shrink: 0;
+        flex-shrink: 1;
+        min-width: 0;
+    }
+
+    .logo-text {
+        min-width: 0;
+    }
+
+    .logo-part {
+        overflow: hidden;
+        text-overflow: ellipsis;
     }
 
     /* Уменьшаем отступы для большего пространства */
     .header-container {
         padding: 0.5rem 0.75rem;
     }
-}
 
-/* Обеспечиваем минимальную ширину для логотипа */
-.logo {
-    min-width: 140px;
-    /* Минимальная ширина для "ТвойКвадрат" */
-}
-
-/* Добавляем отступ для контента под фиксированной шапкой */
-.site-header+* {
-    margin-top: 6rem;
-}
-
-/* Исправление для очень маленьких мобильных устройств */
-@media (max-width: 480px) {
     .mobile-menu {
         max-width: 100%;
     }
@@ -1283,10 +1361,52 @@ onUnmounted(() => {
     .mobile-submenu-content {
         padding-left: 1rem;
     }
+}
 
-    /* Убедимся, что логотип не обрезается */
-    .logo {
-        overflow: visible;
+/* Очень маленькие экраны */
+@media (max-width: 360px) {
+    .logo-part-your {
+        display: none;
+    }
+
+    .header-container {
+        padding: 0.5rem;
+        gap: 0.5rem;
+    }
+
+    .site-header {
+        width: calc(100% - 0.5rem);
+        left: 0.25rem;
+        right: 0.25rem;
+    }
+}
+
+/* Обеспечиваем минимальную ширину для логотипа */
+.logo {
+    min-width: 120px;
+}
+
+/* Добавляем отступ для контента под фиксированной шапкой */
+.site-header+* {
+    margin-top: 6rem;
+    padding-top: 1rem;
+}
+
+/* Предотвращаем горизонтальный скролл на всем сайте */
+main {
+    overflow-x: hidden;
+    max-width: 100vw;
+    width: 100%;
+}
+
+/* Фикс для Safari */
+@supports (-webkit-touch-callout: none) {
+    .site-header {
+        -webkit-backdrop-filter: blur(10px);
+    }
+
+    .site-header.scrolled {
+        -webkit-backdrop-filter: blur(20px);
     }
 }
 </style>
