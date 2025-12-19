@@ -368,7 +368,7 @@ const menuItems = ref([
                     { name: 'Карта мест', description: 'Все на одной карте', path: '/platform' },
                     { name: 'Форум', description: 'Место для обсуждения', path: '/forum' },
                     { name: 'Барахолка квадрата', description: 'Найти то, что нужно именно тебе', path: '/market' },
-                    { name: '"Найдись"', description: 'Найди команду или человека', path: '/projects' }
+                    { name: 'База знаний ЕГЭ/ОГЭ', description: 'Найди команду или человека', path: '/courses' }
                 ]
             },
             {
