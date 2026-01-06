@@ -1,3 +1,4 @@
+// middleware/auth.js
 export default defineNuxtRouteMiddleware(async (to) => {
     const user = useSupabaseUser()
     const supabase = useSupabaseClient()
@@ -5,8 +6,11 @@ export default defineNuxtRouteMiddleware(async (to) => {
     // Получаем текущую сессию
     const { data } = await supabase.auth.getSession()
 
-    // Защищенные маршруты
+    // Защищенные маршруты (где требуется авторизация)
     const protectedRoutes = ['/profile', '/dashboard', '/settings']
+
+    // Страницы, где нужно показывать разный контент для авторизованных/неавторизованных
+    const authAwareRoutes = ['/forum']
 
     // Если маршрут защищен и пользователь не авторизован
     if (protectedRoutes.some(route => to.path.startsWith(route))) {
@@ -19,4 +23,7 @@ export default defineNuxtRouteMiddleware(async (to) => {
     if (data.session && (to.path === '/login' || to.path === '/register')) {
         return navigateTo('/')
     }
+
+    // Для форума просто передаем данные сессии
+    // (не редиректим, но можем использовать данные)
 })
