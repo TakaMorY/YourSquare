@@ -84,6 +84,9 @@
 </template>
 
 <script setup>
+definePageMeta({
+    layout: false // Отключаем layout для этой страницы
+})
 import { ref, onMounted, onUnmounted } from 'vue'
 
 const supabase = useSupabaseClient()
