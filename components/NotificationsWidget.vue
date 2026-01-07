@@ -1,5 +1,5 @@
 <template>
-    <div class="relative">
+    <div class="relative" ref="target">
         <!-- Кнопка уведомлений -->
         <button @click="toggleNotifications"
             class="relative p-2 rounded-xl bg-gray-800 hover:bg-gray-700 border border-gray-700 transition-colors">
@@ -74,10 +74,6 @@
             </div>
 
             <div class="p-4 border-t border-gray-800">
-                <button @click="loadMoreNotifications" v-if="hasMoreNotifications"
-                    class="w-full text-center text-sm text-orange-500 hover:text-orange-400 py-2">
-                    Загрузить еще
-                </button>
                 <button @click="showAllNotifications"
                     class="w-full text-center text-sm text-gray-400 hover:text-white py-2">
                     Посмотреть все уведомления
@@ -94,12 +90,10 @@ import { onClickOutside } from '@vueuse/core'
 const supabase = useSupabaseClient()
 const user = useSupabaseUser()
 
+const target = ref(null)
 const showNotifications = ref(false)
 const notifications = ref([])
 const unreadCount = ref(0)
-const page = ref(1)
-const perPage = 10
-const hasMoreNotifications = ref(true)
 
 // Загрузка уведомлений
 const loadNotifications = async () => {
@@ -111,19 +105,11 @@ const loadNotifications = async () => {
             .select('*')
             .eq('user_id', user.value.id)
             .order('created_at', { ascending: false })
-            .range((page.value - 1) * perPage, page.value * perPage - 1)
+            .limit(10)
 
         if (error) throw error
 
-        if (data.length < perPage) {
-            hasMoreNotifications.value = false
-        }
-
-        if (page.value === 1) {
-            notifications.value = data
-        } else {
-            notifications.value = [...notifications.value, ...data]
-        }
+        notifications.value = data || []
 
         // Подсчет непрочитанных
         unreadCount.value = notifications.value.filter(n => !n.read).length
@@ -189,12 +175,6 @@ const toggleNotifications = () => {
     }
 }
 
-// Загрузить еще уведомлений
-const loadMoreNotifications = () => {
-    page.value += 1
-    loadNotifications()
-}
-
 // Показать все уведомления
 const showAllNotifications = () => {
     // Можно сделать отдельную страницу для всех уведомлений
@@ -221,34 +201,39 @@ const formatDate = (dateString) => {
 }
 
 // Слушаем новые уведомления в реальном времени
+const setupRealtime = () => {
+    if (!user.value) return
+
+    // Подписка на новые уведомления
+    const channel = supabase
+        .channel('forum_notifications')
+        .on(
+            'postgres_changes',
+            {
+                event: 'INSERT',
+                schema: 'public',
+                table: 'forum_notifications',
+                filter: `user_id=eq.${user.value.id}`
+            },
+            (payload) => {
+                notifications.value.unshift(payload.new)
+                if (!payload.new.read) {
+                    unreadCount.value += 1
+                }
+            }
+        )
+        .subscribe()
+}
+
+// Инициализация
 onMounted(() => {
     if (user.value) {
         loadNotifications()
-
-        // Подписка на новые уведомления
-        const channel = supabase
-            .channel('forum_notifications')
-            .on(
-                'postgres_changes',
-                {
-                    event: 'INSERT',
-                    schema: 'public',
-                    table: 'forum_notifications',
-                    filter: `user_id=eq.${user.value.id}`
-                },
-                (payload) => {
-                    notifications.value.unshift(payload.new)
-                    if (!payload.new.read) {
-                        unreadCount.value += 1
-                    }
-                }
-            )
-            .subscribe()
+        setupRealtime()
     }
 })
 
 // Закрытие по клику вне компонента
-const target = ref(null)
 onClickOutside(target, () => {
     showNotifications.value = false
 })

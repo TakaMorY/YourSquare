@@ -1,6 +1,9 @@
 <template>
-    <div :class="['comment-item', isReply ? 'ml-4 md:ml-8 pl-4 border-l-2 border-gray-700' : '']">
-        <div class="bg-gray-800/50 rounded-2xl border border-gray-700 p-4">
+    <div :class="[
+        'comment-item transition-all duration-200',
+        isReply ? 'ml-4 md:ml-8 pl-4 border-l-2 border-gray-700' : ''
+    ]">
+        <div class="bg-gray-800/50 rounded-2xl border border-gray-700 p-4 hover:border-orange-500/30 transition-colors">
             <!-- Заголовок комментария -->
             <div class="flex justify-between items-start mb-3">
                 <div class="flex items-center gap-3">
@@ -40,8 +43,9 @@
 
             <!-- Ответы -->
             <div v-if="replies && replies.length > 0" class="space-y-4 mt-4">
-                <CommentItem v-for="reply in replies" :key="reply.id" :comment="reply" :current-user-id="currentUserId"
-                    :is-reply="true" @reply="$emit('reply', reply)" @delete="$emit('delete', reply.id)" />
+                <CommentItem v-for="reply in replies" :key="reply.id" :comment="reply" :replies="[]"
+                    :current-user-id="currentUserId" :is-reply="true" @reply="$emit('reply', reply)"
+                    @delete="$emit('delete', reply.id)" />
             </div>
         </div>
     </div>
@@ -90,13 +94,3 @@ const formatDate = (dateString) => {
     }
 }
 </script>
-
-<style scoped>
-.comment-item {
-    transition: all 0.2s ease;
-}
-
-.comment-item:hover {
-    transform: translateX(4px);
-}
-</style>

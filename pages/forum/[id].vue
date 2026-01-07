@@ -44,7 +44,7 @@
                     </svg>
                 </div>
                 <h3 class="text-2xl font-bold text-white mb-3">Обсуждение не найдено</h3>
-                <p class="text-gray-400 mb-6">Возможно, оно было удалено или вы ввели неверную ссылку</p>
+                <p class="text-gray-400 mb-6">Возможно, оно было удалено</p>
                 <NuxtLink to="/forum"
                     class="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-orange-500 to-orange-600 text-white rounded-xl hover:from-orange-600 hover:to-orange-700 transition-all duration-300 font-medium">
                     Вернуться на форум
@@ -92,7 +92,7 @@
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                         d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
                                 </svg>
-                                <span>{{ post.views_count }}</span>
+                                <span>{{ post.views_count || 0 }}</span>
                             </div>
                         </div>
                     </div>
@@ -172,14 +172,59 @@
         </div>
 
         <!-- Попап для ответа -->
-        <ReplyPopup v-if="showReplyPopup" :parent-comment="replyToComment" @submit="submitReply"
-            @close="closeReplyPopup" />
+        <div v-if="showReplyPopup" class="fixed inset-0 z-50 flex items-center justify-center p-4">
+            <div class="absolute inset-0 bg-black/70 backdrop-blur-sm" @click="closeReplyPopup"></div>
+
+            <div class="relative bg-gray-900 border border-gray-700 rounded-2xl shadow-2xl w-full max-w-md">
+                <div class="p-6 border-b border-gray-800">
+                    <div class="flex items-center justify-between">
+                        <h3 class="text-xl font-bold text-white">
+                            Ответ пользователю {{ replyToComment?.author_name }}
+                        </h3>
+                        <button @click="closeReplyPopup" class="p-1 text-gray-400 hover:text-white transition-colors">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M6 18L18 6M6 6l12 12" />
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="p-6">
+                    <div class="mb-4 p-3 bg-gray-800 rounded-xl">
+                        <p class="text-sm text-gray-300">{{ replyToComment?.content }}</p>
+                    </div>
+
+                    <textarea v-model="replyContent" ref="replyTextarea" placeholder="Ваш ответ..." rows="4"
+                        class="w-full px-4 py-3 bg-gray-800 border border-gray-700 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-orange-500 outline-none resize-none placeholder-gray-500 text-white"
+                        @keydown.enter.ctrl="submitReply"></textarea>
+
+                    <div class="flex justify-between items-center mt-4">
+                        <div class="text-sm text-gray-400">
+                            Ctrl+Enter для отправки
+                        </div>
+                        <div class="flex gap-3">
+                            <button @click="closeReplyPopup"
+                                class="px-4 py-2 text-gray-400 hover:text-white transition-colors">
+                                Отмена
+                            </button>
+                            <button @click="submitReply" :disabled="!replyContent.trim()" :class="[
+                                'px-5 py-2 rounded-xl font-medium transition-all duration-300',
+                                replyContent.trim()
+                                    ? 'bg-gradient-to-r from-orange-500 to-orange-600 text-white hover:from-orange-600 hover:to-orange-700'
+                                    : 'bg-gray-800 text-gray-400 cursor-not-allowed border border-gray-700'
+                            ]">
+                                Отправить
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 </template>
 
 <script setup>
-import { ref, onMounted, computed } from 'vue'
-
 const route = useRoute()
 const supabase = useSupabaseClient()
 const user = useSupabaseUser()
@@ -191,6 +236,8 @@ const commentsLoading = ref(false)
 const isFavorited = ref(false)
 const showReplyPopup = ref(false)
 const replyToComment = ref(null)
+const replyContent = ref('')
+const replyTextarea = ref(null)
 
 const newComment = ref({
     content: '',
@@ -359,9 +406,10 @@ const addComment = async () => {
             }
         }
 
-        // Очистка формы и обновление
+        // Очистка формы
         newComment.value = { content: '', parent_id: null }
-        await loadComments()
+
+        // Не перезагружаем комментарии, они обновятся через realtime
 
     } catch (error) {
         console.error('Ошибка добавления комментария:', error)
@@ -371,13 +419,19 @@ const addComment = async () => {
 const handleReply = (comment) => {
     replyToComment.value = comment
     showReplyPopup.value = true
+    nextTick(() => {
+        replyTextarea.value?.focus()
+    })
 }
 
-const submitReply = async (content) => {
+const submitReply = async () => {
+    if (!replyContent.value.trim()) return
+
     newComment.value = {
-        content,
+        content: replyContent.value.trim(),
         parent_id: replyToComment.value.id
     }
+
     await addComment()
     closeReplyPopup()
 }
@@ -385,6 +439,7 @@ const submitReply = async (content) => {
 const closeReplyPopup = () => {
     showReplyPopup.value = false
     replyToComment.value = null
+    replyContent.value = ''
 }
 
 const deleteComment = async (commentId) => {
@@ -399,7 +454,8 @@ const deleteComment = async (commentId) => {
 
         if (error) throw error
 
-        await loadComments()
+        // Удаляем комментарий локально
+        comments.value = comments.value.filter(c => c.id !== commentId)
 
     } catch (error) {
         console.error('Ошибка удаления комментария:', error)
@@ -420,13 +476,8 @@ const toggleFavorite = async () => {
 
             if (error) throw error
 
-            // Обновляем счетчик
-            await supabase
-                .from('forum_posts')
-                .update({ favorites_count: post.value.favorites_count - 1 })
-                .eq('id', route.params.id)
-
-            post.value.favorites_count -= 1
+            // Обновляем счетчик локально
+            post.value.favorites_count = Math.max(0, post.value.favorites_count - 1)
         } else {
             // Добавляем в избранное
             const { error } = await supabase
@@ -438,13 +489,8 @@ const toggleFavorite = async () => {
 
             if (error) throw error
 
-            // Обновляем счетчик
-            await supabase
-                .from('forum_posts')
-                .update({ favorites_count: post.value.favorites_count + 1 })
-                .eq('id', route.params.id)
-
-            post.value.favorites_count += 1
+            // Обновляем счетчик локально
+            post.value.favorites_count = (post.value.favorites_count || 0) + 1
 
             // Создаем уведомление для автора поста
             if (post.value.author_id !== user.value.id) {
@@ -468,12 +514,10 @@ const toggleFavorite = async () => {
     }
 }
 
-// Инициализация
-onMounted(() => {
-    loadPost()
-
-    // Подписка на новые комментарии в реальном времени
-    const channel = supabase
+// Настройка realtime подписок
+const setupRealtime = () => {
+    // Подписка на новые комментарии
+    const commentsChannel = supabase
         .channel(`post-${route.params.id}-comments`)
         .on(
             'postgres_changes',
@@ -483,8 +527,9 @@ onMounted(() => {
                 table: 'forum_comments',
                 filter: `post_id=eq.${route.params.id}`
             },
-            () => {
-                loadComments()
+            (payload) => {
+                // Добавляем новый комментарий в список
+                comments.value.push(payload.new)
             }
         )
         .on(
@@ -495,11 +540,47 @@ onMounted(() => {
                 table: 'forum_comments',
                 filter: `post_id=eq.${route.params.id}`
             },
-            () => {
-                loadComments()
+            (payload) => {
+                // Удаляем комментарий из списка
+                comments.value = comments.value.filter(c => c.id !== payload.old.id)
             }
         )
         .subscribe()
+
+    // Подписка на изменения избранного
+    const favoritesChannel = supabase
+        .channel(`post-${route.params.id}-favorites`)
+        .on(
+            'postgres_changes',
+            {
+                event: '*',
+                schema: 'public',
+                table: 'forum_favorites',
+                filter: `post_id=eq.${route.params.id}`
+            },
+            (payload) => {
+                if (payload.eventType === 'INSERT') {
+                    post.value.favorites_count = (post.value.favorites_count || 0) + 1
+                    if (payload.new.user_id === user.value?.id) {
+                        isFavorited.value = true
+                    }
+                } else if (payload.eventType === 'DELETE') {
+                    post.value.favorites_count = Math.max(0, (post.value.favorites_count || 1) - 1)
+                    if (payload.old.user_id === user.value?.id) {
+                        isFavorited.value = false
+                    }
+                }
+            }
+        )
+        .subscribe()
+}
+
+// Инициализация
+onMounted(() => {
+    loadPost()
+    if (user.value) {
+        setupRealtime()
+    }
 })
 </script>
 

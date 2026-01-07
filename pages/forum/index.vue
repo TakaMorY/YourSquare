@@ -112,12 +112,11 @@
                     Присоединяйтесь к обсуждениям
                 </h2>
                 <p class="text-gray-400 mb-8 max-w-md mx-auto">
-                    Для участия в форуме необходимо войти в систему. Задавайте вопросы, делитесь опытом и находите
-                    решения вместе с сообществом.
+                    Для участия в форуме необходимо войти в систему.
                 </p>
                 <div class="flex flex-col sm:flex-row gap-4 justify-center">
                     <NuxtLink to="/login"
-                        class="px-8 py-3.5 bg-gradient-to-r from-orange-500 to-orange-600 text-white rounded-xl hover:from-orange-600 hover:to-orange-700 transition-all duration-300 shadow-lg hover:shadow-xl font-medium flex items-center justify-center gap-2">
+                        class="px-8 py-3.5 bg-gradient-to-r from-orange-500 to-orange-600 text-white rounded-xl hover:from-orange-600 hover:to-orange-700 transition-all duration-300 shadow-lg hover:shadow-xl font-medium">
                         Войти в систему
                     </NuxtLink>
                     <NuxtLink to="/register"
@@ -211,13 +210,19 @@
 
                                 <!-- Статистика -->
                                 <div class="flex md:flex-col gap-4 md:gap-2">
+                                    <!-- Избранное -->
                                     <div class="flex items-center gap-2">
-                                        <svg class="w-5 h-5 text-orange-500" fill="none" stroke="currentColor"
-                                            viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
-                                        </svg>
-                                        <span class="font-medium text-white">{{ post.favorites_count }}</span>
+                                        <button @click="toggleFavorite(post)" :class="[
+                                            'flex items-center gap-2 transition-colors',
+                                            post.isFavorited ? 'text-orange-500' : 'text-gray-400 hover:text-orange-500'
+                                        ]">
+                                            <svg :class="['w-5 h-5', post.isFavorited ? 'fill-orange-500' : 'fill-none']"
+                                                stroke-width="2" viewBox="0 0 24 24">
+                                                <path
+                                                    d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" />
+                                            </svg>
+                                            <span class="font-medium">{{ post.favorites_count }}</span>
+                                        </button>
                                     </div>
                                     <div class="flex items-center gap-2">
                                         <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor"
@@ -227,7 +232,7 @@
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                                 d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
                                         </svg>
-                                        <span class="font-medium text-gray-400">{{ post.views_count }}</span>
+                                        <span class="font-medium text-gray-400">{{ post.views_count || 0 }}</span>
                                     </div>
                                 </div>
                             </div>
@@ -262,8 +267,6 @@
 </template>
 
 <script setup>
-import { debounce } from 'lodash-es'
-
 const supabase = useSupabaseClient()
 const user = useSupabaseUser()
 const router = useRouter()
@@ -320,10 +323,6 @@ const getFullUserName = () => {
     if (userData.user_metadata?.name) {
         return userData.user_metadata.name
     }
-    if (userData.user_metadata?.full_name) {
-        return userData.user_metadata.full_name
-    }
-
     return userData.email?.split('@')[0] || 'Пользователь'
 }
 
@@ -349,8 +348,21 @@ const formatDate = (dateString) => {
     }
 }
 
+// Простая реализация debounce
+const debounce = (func, wait) => {
+    let timeout
+    return function executedFunction(...args) {
+        const later = () => {
+            clearTimeout(timeout)
+            func(...args)
+        }
+        clearTimeout(timeout)
+        timeout = setTimeout(later, wait)
+    }
+}
+
 // Поиск обсуждений
-const debouncedSearch = debounce(async () => {
+const performSearch = async () => {
     if (!searchQuery.value.trim()) {
         searchResults.value = []
         return
@@ -372,7 +384,10 @@ const debouncedSearch = debounce(async () => {
         console.error('Ошибка поиска:', error)
         searchResults.value = []
     }
-}, 300)
+}
+
+// Обертка для debounce
+const debouncedSearch = debounce(performSearch, 300)
 
 const goToPost = (postId) => {
     searchQuery.value = ''
@@ -380,7 +395,7 @@ const goToPost = (postId) => {
     router.push(`/forum/${postId}`)
 }
 
-// Загрузка постов
+// Загрузка постов с проверкой избранного
 const loadPosts = async () => {
     loading.value = true
     try {
@@ -390,7 +405,28 @@ const loadPosts = async () => {
             .order('created_at', { ascending: false })
 
         if (error) throw error
-        posts.value = data || []
+
+        // Проверяем избранное для каждого поста
+        const postsWithFavorites = await Promise.all(
+            (data || []).map(async (post) => {
+                if (user.value) {
+                    const { data: favoriteData } = await supabase
+                        .from('forum_favorites')
+                        .select('id')
+                        .eq('post_id', post.id)
+                        .eq('user_id', user.value.id)
+                        .single()
+
+                    return {
+                        ...post,
+                        isFavorited: !!favoriteData
+                    }
+                }
+                return post
+            })
+        )
+
+        posts.value = postsWithFavorites
 
     } catch (error) {
         console.error('Ошибка загрузки:', error)
@@ -449,6 +485,65 @@ const deletePost = async (post) => {
     }
 }
 
+// Добавление/удаление из избранного
+const toggleFavorite = async (post) => {
+    if (!user.value) return
+
+    try {
+        if (post.isFavorited) {
+            // Удаляем из избранного
+            const { error } = await supabase
+                .from('forum_favorites')
+                .delete()
+                .eq('post_id', post.id)
+                .eq('user_id', user.value.id)
+
+            if (error) throw error
+
+            // Обновляем счетчик локально
+            post.favorites_count = Math.max(0, post.favorites_count - 1)
+            post.isFavorited = false
+
+        } else {
+            // Добавляем в избранное
+            const { error } = await supabase
+                .from('forum_favorites')
+                .insert({
+                    post_id: post.id,
+                    user_id: user.value.id
+                })
+
+            if (error) throw error
+
+            // Обновляем счетчик локально
+            post.favorites_count = (post.favorites_count || 0) + 1
+            post.isFavorited = true
+
+            // Создаем уведомление для автора поста
+            if (post.author_id !== user.value.id) {
+                await supabase
+                    .from('forum_notifications')
+                    .insert({
+                        user_id: post.author_id,
+                        post_id: post.id,
+                        sender_id: user.value.id,
+                        sender_name: getFullUserName(),
+                        type: 'favorite',
+                        message: `${getFullUserName()} добавил(а) ваше обсуждение "${post.title}" в избранное`
+                    })
+            }
+        }
+
+        // Если на вкладке "Популярные", нужно обновить порядок
+        if (activeTab.value === 'popular') {
+            posts.value = [...posts.value].sort((a, b) => b.favorites_count - a.favorites_count)
+        }
+
+    } catch (error) {
+        console.error('Ошибка избранного:', error)
+    }
+}
+
 // Выход
 const handleLogout = async () => {
     try {
@@ -459,10 +554,88 @@ const handleLogout = async () => {
     }
 }
 
+// Подписка на изменения в реальном времени
+const setupRealtime = () => {
+    if (!user.value) return
+
+    // Подписка на новые посты
+    const postsChannel = supabase
+        .channel('forum_posts')
+        .on(
+            'postgres_changes',
+            {
+                event: 'INSERT',
+                schema: 'public',
+                table: 'forum_posts'
+            },
+            async (payload) => {
+                // Проверяем избранное для нового поста
+                if (user.value) {
+                    const { data: favoriteData } = await supabase
+                        .from('forum_favorites')
+                        .select('id')
+                        .eq('post_id', payload.new.id)
+                        .eq('user_id', user.value.id)
+                        .single()
+
+                    posts.value.unshift({
+                        ...payload.new,
+                        isFavorited: !!favoriteData
+                    })
+                }
+            }
+        )
+        .on(
+            'postgres_changes',
+            {
+                event: 'DELETE',
+                schema: 'public',
+                table: 'forum_posts'
+            },
+            (payload) => {
+                posts.value = posts.value.filter(post => post.id !== payload.old.id)
+            }
+        )
+        .subscribe()
+
+    // Подписка на изменения избранного
+    const favoritesChannel = supabase
+        .channel('forum_favorites')
+        .on(
+            'postgres_changes',
+            {
+                event: '*',
+                schema: 'public',
+                table: 'forum_favorites'
+            },
+            async (payload) => {
+                // Обновляем локальное состояние избранного
+                const postIndex = posts.value.findIndex(p => p.id === payload.new?.post_id)
+                if (postIndex !== -1) {
+                    const post = posts.value[postIndex]
+
+                    if (payload.eventType === 'INSERT') {
+                        if (payload.new.user_id === user.value.id) {
+                            post.isFavorited = true
+                        }
+                        post.favorites_count = (post.favorites_count || 0) + 1
+                    } else if (payload.eventType === 'DELETE') {
+                        if (payload.old.user_id === user.value.id) {
+                            post.isFavorited = false
+                        }
+                        post.favorites_count = Math.max(0, (post.favorites_count || 1) - 1)
+                    }
+                }
+            }
+        )
+        .subscribe()
+}
+
 // Инициализация
 onMounted(() => {
     if (user.value) {
         loadPosts()
+        setupRealtime()
     }
 })
 </script>
