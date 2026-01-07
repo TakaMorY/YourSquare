@@ -1,15 +1,5 @@
 <template>
     <div class="min-h-screen bg-gradient-to-br from-black via-gray-900 to-gray-800 text-gray-100">
-        <!-- Декоративные элементы -->
-        <div class="fixed inset-0 overflow-hidden pointer-events-none">
-            <div
-                class="absolute -top-40 -right-40 w-80 h-80 bg-gradient-to-r from-orange-500/10 to-orange-600/5 rounded-full blur-3xl">
-            </div>
-            <div
-                class="absolute top-1/2 -left-40 w-96 h-96 bg-gradient-to-r from-orange-600/5 to-orange-400/10 rounded-full blur-3xl">
-            </div>
-        </div>
-
         <div class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
             <!-- Хедер -->
             <header class="mb-12">
@@ -25,21 +15,16 @@
                         </p>
                     </div>
 
-                    <!-- Уведомления и профиль -->
+                    <!-- Профиль пользователя -->
                     <div class="flex items-center gap-3">
                         <!-- Виджет уведомлений -->
                         <NotificationsWidget v-if="user" />
 
-                        <!-- Профиль пользователя -->
                         <div v-if="user" class="flex items-center gap-3">
                             <div class="relative group">
                                 <div
                                     class="w-12 h-12 bg-gradient-to-r from-orange-500 to-orange-600 rounded-full flex items-center justify-center text-white font-bold text-lg shadow-lg shadow-orange-500/20">
                                     {{ getUserInitials() }}
-                                </div>
-                                <div
-                                    class="absolute -bottom-10 left-1/2 transform -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-opacity duration-200 bg-gray-900 text-white text-sm px-3 py-1 rounded-lg whitespace-nowrap border border-gray-700">
-                                    {{ getUserName() }}
                                 </div>
                             </div>
                             <button @click="handleLogout"
@@ -69,17 +54,6 @@
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                         d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                                 </svg>
-                            </div>
-                            <!-- Результаты поиска -->
-                            <div v-if="searchResults.length > 0 && searchQuery"
-                                class="absolute z-50 w-full mt-2 bg-gray-900 border border-gray-700 rounded-xl shadow-2xl max-h-96 overflow-y-auto">
-                                <div v-for="result in searchResults" :key="result.id"
-                                    class="p-4 border-b border-gray-800 hover:bg-gray-800 cursor-pointer transition-colors"
-                                    @click="goToPost(result.id)">
-                                    <div class="font-medium text-white">{{ result.title }}</div>
-                                    <div class="text-sm text-gray-400 mt-1 line-clamp-2">{{ result.content }}</div>
-                                    <div class="text-xs text-gray-500 mt-2">Автор: {{ result.author_name }}</div>
-                                </div>
                             </div>
                         </div>
 
@@ -271,12 +245,11 @@ const supabase = useSupabaseClient()
 const user = useSupabaseUser()
 const router = useRouter()
 
-// Инициализация данных
 const posts = ref([])
 const loading = ref(false)
 const searchQuery = ref('')
 const searchResults = ref([])
-const activeTab = ref('all') // all, popular, my
+const activeTab = ref('all')
 
 const newPost = ref({
     title: '',
@@ -289,7 +262,6 @@ const tabs = [
     { id: 'my', label: 'Мои обсуждения' }
 ]
 
-// Computed свойства
 const filteredPosts = computed(() => {
     if (activeTab.value === 'my') {
         return posts.value.filter(post => post.author_id === user.value?.id)
@@ -303,17 +275,16 @@ const canCreatePost = computed(() => {
     return newPost.value.title.trim() && newPost.value.content.trim() && !loading.value
 })
 
-// Функции для получения имени пользователя
+const getUserInitials = () => {
+    if (!user.value?.user_metadata?.name) return 'А'
+    return user.value.user_metadata.name.charAt(0).toUpperCase()
+}
+
 const getUserName = () => {
     if (user.value?.user_metadata?.name) {
         return user.value.user_metadata.name
     }
     return user.value?.email?.split('@')[0] || 'Пользователь'
-}
-
-const getUserInitials = () => {
-    const name = getUserName()
-    return name.charAt(0).toUpperCase()
 }
 
 const getFullUserName = () => {
@@ -331,15 +302,11 @@ const formatDate = (dateString) => {
     const now = new Date()
     const diff = now - date
     const minutes = Math.floor(diff / 60000)
-    const hours = Math.floor(minutes / 60)
-    const days = Math.floor(hours / 24)
 
     if (minutes < 60) {
         return `${minutes} мин назад`
-    } else if (hours < 24) {
-        return `${hours} ч назад`
-    } else if (days < 7) {
-        return `${days} дн назад`
+    } else if (minutes < 1440) {
+        return `${Math.floor(minutes / 60)} ч назад`
     } else {
         return date.toLocaleDateString('ru-RU', {
             day: 'numeric',
@@ -348,7 +315,6 @@ const formatDate = (dateString) => {
     }
 }
 
-// Простая реализация debounce
 const debounce = (func, wait) => {
     let timeout
     return function executedFunction(...args) {
@@ -361,7 +327,6 @@ const debounce = (func, wait) => {
     }
 }
 
-// Поиск обсуждений
 const performSearch = async () => {
     if (!searchQuery.value.trim()) {
         searchResults.value = []
@@ -372,10 +337,7 @@ const performSearch = async () => {
         const { data, error } = await supabase
             .from('forum_posts')
             .select('id, title, content, author_name')
-            .textSearch('search_vector', searchQuery.value, {
-                type: 'websearch',
-                config: 'russian'
-            })
+            .ilike('title', `%${searchQuery.value}%`)
             .limit(10)
 
         if (error) throw error
@@ -386,16 +348,8 @@ const performSearch = async () => {
     }
 }
 
-// Обертка для debounce
 const debouncedSearch = debounce(performSearch, 300)
 
-const goToPost = (postId) => {
-    searchQuery.value = ''
-    searchResults.value = []
-    router.push(`/forum/${postId}`)
-}
-
-// Загрузка постов с проверкой избранного
 const loadPosts = async () => {
     loading.value = true
     try {
@@ -406,7 +360,6 @@ const loadPosts = async () => {
 
         if (error) throw error
 
-        // Проверяем избранное для каждого поста
         const postsWithFavorites = await Promise.all(
             (data || []).map(async (post) => {
                 if (user.value) {
@@ -435,7 +388,6 @@ const loadPosts = async () => {
     }
 }
 
-// Создание поста
 const createPost = async () => {
     if (!canCreatePost.value) return
 
@@ -454,7 +406,6 @@ const createPost = async () => {
 
         if (error) throw error
 
-        // Очистка формы и обновление
         newPost.value = { title: '', content: '' }
         await loadPosts()
 
@@ -465,7 +416,6 @@ const createPost = async () => {
     }
 }
 
-// Удаление поста
 const deletePost = async (post) => {
     if (!confirm('Удалить это обсуждение?')) return
 
@@ -485,13 +435,11 @@ const deletePost = async (post) => {
     }
 }
 
-// Добавление/удаление из избранного
 const toggleFavorite = async (post) => {
     if (!user.value) return
 
     try {
         if (post.isFavorited) {
-            // Удаляем из избранного
             const { error } = await supabase
                 .from('forum_favorites')
                 .delete()
@@ -500,12 +448,10 @@ const toggleFavorite = async (post) => {
 
             if (error) throw error
 
-            // Обновляем счетчик локально
             post.favorites_count = Math.max(0, post.favorites_count - 1)
             post.isFavorited = false
 
         } else {
-            // Добавляем в избранное
             const { error } = await supabase
                 .from('forum_favorites')
                 .insert({
@@ -515,11 +461,9 @@ const toggleFavorite = async (post) => {
 
             if (error) throw error
 
-            // Обновляем счетчик локально
             post.favorites_count = (post.favorites_count || 0) + 1
             post.isFavorited = true
 
-            // Создаем уведомление для автора поста
             if (post.author_id !== user.value.id) {
                 await supabase
                     .from('forum_notifications')
@@ -534,7 +478,6 @@ const toggleFavorite = async (post) => {
             }
         }
 
-        // Если на вкладке "Популярные", нужно обновить порядок
         if (activeTab.value === 'popular') {
             posts.value = [...posts.value].sort((a, b) => b.favorites_count - a.favorites_count)
         }
@@ -544,7 +487,6 @@ const toggleFavorite = async (post) => {
     }
 }
 
-// Выход
 const handleLogout = async () => {
     try {
         await supabase.auth.signOut()
@@ -554,13 +496,11 @@ const handleLogout = async () => {
     }
 }
 
-// Подписка на изменения в реальном времени
 const setupRealtime = () => {
     if (!user.value) return
 
-    // Подписка на новые посты
     const postsChannel = supabase
-        .channel('forum_posts')
+        .channel('forum_posts_realtime')
         .on(
             'postgres_changes',
             {
@@ -569,7 +509,6 @@ const setupRealtime = () => {
                 table: 'forum_posts'
             },
             async (payload) => {
-                // Проверяем избранное для нового поста
                 if (user.value) {
                     const { data: favoriteData } = await supabase
                         .from('forum_favorites')
@@ -596,42 +535,23 @@ const setupRealtime = () => {
                 posts.value = posts.value.filter(post => post.id !== payload.old.id)
             }
         )
-        .subscribe()
-
-    // Подписка на изменения избранного
-    const favoritesChannel = supabase
-        .channel('forum_favorites')
         .on(
             'postgres_changes',
             {
-                event: '*',
+                event: 'UPDATE',
                 schema: 'public',
-                table: 'forum_favorites'
+                table: 'forum_posts'
             },
-            async (payload) => {
-                // Обновляем локальное состояние избранного
-                const postIndex = posts.value.findIndex(p => p.id === payload.new?.post_id)
-                if (postIndex !== -1) {
-                    const post = posts.value[postIndex]
-
-                    if (payload.eventType === 'INSERT') {
-                        if (payload.new.user_id === user.value.id) {
-                            post.isFavorited = true
-                        }
-                        post.favorites_count = (post.favorites_count || 0) + 1
-                    } else if (payload.eventType === 'DELETE') {
-                        if (payload.old.user_id === user.value.id) {
-                            post.isFavorited = false
-                        }
-                        post.favorites_count = Math.max(0, (post.favorites_count || 1) - 1)
-                    }
+            (payload) => {
+                const index = posts.value.findIndex(p => p.id === payload.new.id)
+                if (index !== -1) {
+                    posts.value[index] = { ...posts.value[index], ...payload.new }
                 }
             }
         )
         .subscribe()
 }
 
-// Инициализация
 onMounted(() => {
     if (user.value) {
         loadPosts()
@@ -639,12 +559,3 @@ onMounted(() => {
     }
 })
 </script>
-
-<style scoped>
-.line-clamp-2 {
-    display: -webkit-box;
-    -webkit-line-clamp: 2;
-    -webkit-box-orient: vertical;
-    overflow: hidden;
-}
-</style>

@@ -162,60 +162,84 @@
                         <p class="text-gray-400">Пока нет комментариев. Будьте первым!</p>
                     </div>
 
-                    <div v-else class="space-y-6">
-                        <CommentItem v-for="comment in rootComments" :key="comment.id" :comment="comment"
-                            :replies="getReplies(comment.id)" :current-user-id="user?.id" @reply="handleReply"
-                            @delete="deleteComment" class="animate-fade-in" />
-                    </div>
-                </div>
-            </div>
-        </div>
+                    <div v-else class="space-y-4">
+                        <div v-for="comment in comments" :key="comment.id" :class="[
+                            'comment-item bg-gray-800/50 rounded-2xl border border-gray-700 p-4 hover:border-orange-500/30 transition-colors',
+                            comment.parent_id ? 'ml-8 md:ml-12' : ''
+                        ]">
+                            <!-- Информация о комментарии -->
+                            <div class="flex justify-between items-start mb-3">
+                                <div class="flex items-center gap-3">
+                                    <div
+                                        class="w-8 h-8 bg-gradient-to-r from-orange-500 to-orange-600 rounded-full flex items-center justify-center text-white font-bold text-sm">
+                                        {{ comment.author_name.charAt(0).toUpperCase() }}
+                                    </div>
+                                    <div>
+                                        <div class="font-medium text-white">{{ comment.author_name }}</div>
+                                        <div class="text-xs text-gray-400">{{ formatDate(comment.created_at) }}</div>
+                                    </div>
+                                </div>
 
-        <!-- Попап для ответа -->
-        <div v-if="showReplyPopup" class="fixed inset-0 z-50 flex items-center justify-center p-4">
-            <div class="absolute inset-0 bg-black/70 backdrop-blur-sm" @click="closeReplyPopup"></div>
+                                <!-- Действия -->
+                                <div class="flex items-center gap-2">
+                                    <button v-if="user && comment.author_id !== user.id" @click="startReply(comment)"
+                                        class="p-1.5 text-gray-400 hover:text-orange-500 transition-colors"
+                                        title="Ответить">
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M3 10h10a8 8 0 018 8v2M3 10l6 6m-6-6l6-6" />
+                                        </svg>
+                                    </button>
+                                    <button v-if="comment.author_id === user?.id" @click="deleteComment(comment)"
+                                        class="p-1.5 text-gray-400 hover:text-red-400 transition-colors"
+                                        title="Удалить">
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                        </svg>
+                                    </button>
+                                </div>
+                            </div>
 
-            <div class="relative bg-gray-900 border border-gray-700 rounded-2xl shadow-2xl w-full max-w-md">
-                <div class="p-6 border-b border-gray-800">
-                    <div class="flex items-center justify-between">
-                        <h3 class="text-xl font-bold text-white">
-                            Ответ пользователю {{ replyToComment?.author_name }}
-                        </h3>
-                        <button @click="closeReplyPopup" class="p-1 text-gray-400 hover:text-white transition-colors">
-                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M6 18L18 6M6 6l12 12" />
-                            </svg>
-                        </button>
-                    </div>
-                </div>
+                            <!-- Содержание комментария -->
+                            <div class="mb-3">
+                                <p class="text-gray-300 whitespace-pre-line">{{ comment.content }}</p>
+                            </div>
 
-                <div class="p-6">
-                    <div class="mb-4 p-3 bg-gray-800 rounded-xl">
-                        <p class="text-sm text-gray-300">{{ replyToComment?.content }}</p>
-                    </div>
-
-                    <textarea v-model="replyContent" ref="replyTextarea" placeholder="Ваш ответ..." rows="4"
-                        class="w-full px-4 py-3 bg-gray-800 border border-gray-700 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-orange-500 outline-none resize-none placeholder-gray-500 text-white"
-                        @keydown.enter.ctrl="submitReply"></textarea>
-
-                    <div class="flex justify-between items-center mt-4">
-                        <div class="text-sm text-gray-400">
-                            Ctrl+Enter для отправки
-                        </div>
-                        <div class="flex gap-3">
-                            <button @click="closeReplyPopup"
-                                class="px-4 py-2 text-gray-400 hover:text-white transition-colors">
-                                Отмена
-                            </button>
-                            <button @click="submitReply" :disabled="!replyContent.trim()" :class="[
-                                'px-5 py-2 rounded-xl font-medium transition-all duration-300',
-                                replyContent.trim()
-                                    ? 'bg-gradient-to-r from-orange-500 to-orange-600 text-white hover:from-orange-600 hover:to-orange-700'
-                                    : 'bg-gray-800 text-gray-400 cursor-not-allowed border border-gray-700'
-                            ]">
-                                Отправить
-                            </button>
+                            <!-- Форма ответа (если открыта) -->
+                            <div v-if="replyToCommentId === comment.id" class="mt-4 pt-4 border-t border-gray-700">
+                                <div class="flex gap-3">
+                                    <div
+                                        class="w-8 h-8 bg-gradient-to-r from-orange-500 to-orange-600 rounded-full flex items-center justify-center text-white font-bold text-sm flex-shrink-0">
+                                        {{ getUserInitials() }}
+                                    </div>
+                                    <div class="flex-1">
+                                        <textarea v-model="replyContent" @keydown.enter.ctrl="submitReply(comment)"
+                                            placeholder="Ответить на комментарий..." rows="2"
+                                            class="w-full px-3 py-2 bg-gray-800 border border-gray-700 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 outline-none resize-none placeholder-gray-500 text-white text-sm"></textarea>
+                                        <div class="flex justify-between items-center mt-2">
+                                            <div class="text-xs text-gray-400">
+                                                Ctrl+Enter для отправки
+                                            </div>
+                                            <div class="flex gap-2">
+                                                <button @click="cancelReply"
+                                                    class="px-3 py-1 text-gray-400 hover:text-white text-sm transition-colors">
+                                                    Отмена
+                                                </button>
+                                                <button @click="submitReply(comment)" :disabled="!replyContent.trim()"
+                                                    :class="[
+                                                        'px-3 py-1 rounded-lg text-sm font-medium transition-all duration-300',
+                                                        replyContent.trim()
+                                                            ? 'bg-gradient-to-r from-orange-500 to-orange-600 text-white hover:from-orange-600 hover:to-orange-700'
+                                                            : 'bg-gray-800 text-gray-400 cursor-not-allowed border border-gray-700'
+                                                    ]">
+                                                    Отправить
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -234,19 +258,12 @@ const loading = ref(true)
 const comments = ref([])
 const commentsLoading = ref(false)
 const isFavorited = ref(false)
-const showReplyPopup = ref(false)
-const replyToComment = ref(null)
+const replyToCommentId = ref(null)
 const replyContent = ref('')
-const replyTextarea = ref(null)
 
 const newComment = ref({
     content: '',
     parent_id: null
-})
-
-// Computed свойства
-const rootComments = computed(() => {
-    return comments.value.filter(comment => !comment.parent_id)
 })
 
 const getUserInitials = () => {
@@ -290,21 +307,10 @@ const formatDate = (dateString) => {
     }
 }
 
-// Функции
-const getReplies = (parentId) => {
-    return comments.value.filter(comment => comment.parent_id === parentId)
-}
-
 const loadPost = async () => {
     loading.value = true
     try {
         const postId = route.params.id
-
-        // Увеличиваем счетчик просмотров
-        await supabase
-            .from('forum_posts')
-            .update({ views_count: (post.value?.views_count || 0) + 1 })
-            .eq('id', postId)
 
         // Загружаем пост
         const { data, error } = await supabase
@@ -315,6 +321,12 @@ const loadPost = async () => {
 
         if (error) throw error
         post.value = data
+
+        // Увеличиваем счетчик просмотров
+        await supabase
+            .from('forum_posts')
+            .update({ views_count: (data.views_count || 0) + 1 })
+            .eq('id', postId)
 
         // Проверяем, добавлен ли в избранное
         if (user.value) {
@@ -362,7 +374,7 @@ const addComment = async () => {
     try {
         const authorName = getFullUserName()
 
-        const { error } = await supabase
+        const { data: commentData, error } = await supabase
             .from('forum_comments')
             .insert({
                 post_id: route.params.id,
@@ -371,8 +383,13 @@ const addComment = async () => {
                 content: newComment.value.content.trim(),
                 parent_id: newComment.value.parent_id
             })
+            .select()
+            .single()
 
         if (error) throw error
+
+        // Добавляем комментарий в список
+        comments.value.push(commentData)
 
         // Создаем уведомление для автора поста, если это не он сам
         if (post.value.author_id !== user.value.id && !newComment.value.parent_id) {
@@ -381,6 +398,7 @@ const addComment = async () => {
                 .insert({
                     user_id: post.value.author_id,
                     post_id: route.params.id,
+                    comment_id: commentData.id,
                     sender_id: user.value.id,
                     sender_name: authorName,
                     type: 'comment',
@@ -397,11 +415,11 @@ const addComment = async () => {
                     .insert({
                         user_id: parentComment.author_id,
                         post_id: route.params.id,
-                        comment_id: newComment.value.parent_id,
+                        comment_id: commentData.id,
                         sender_id: user.value.id,
                         sender_name: authorName,
                         type: 'reply',
-                        message: `${authorName} ответил(а) на ваш комментарий`
+                        message: `${authorName} ответил(а) на ваш комментарий в обсуждении "${post.value.title}"`
                     })
             }
         }
@@ -409,56 +427,59 @@ const addComment = async () => {
         // Очистка формы
         newComment.value = { content: '', parent_id: null }
 
-        // Не перезагружаем комментарии, они обновятся через realtime
-
     } catch (error) {
         console.error('Ошибка добавления комментария:', error)
+        alert('Не удалось добавить комментарий')
     }
 }
 
-const handleReply = (comment) => {
-    replyToComment.value = comment
-    showReplyPopup.value = true
-    nextTick(() => {
-        replyTextarea.value?.focus()
-    })
-}
-
-const submitReply = async () => {
-    if (!replyContent.value.trim()) return
-
-    newComment.value = {
-        content: replyContent.value.trim(),
-        parent_id: replyToComment.value.id
-    }
-
-    await addComment()
-    closeReplyPopup()
-}
-
-const closeReplyPopup = () => {
-    showReplyPopup.value = false
-    replyToComment.value = null
+const startReply = (comment) => {
+    replyToCommentId.value = comment.id
     replyContent.value = ''
 }
 
-const deleteComment = async (commentId) => {
+const cancelReply = () => {
+    replyToCommentId.value = null
+    replyContent.value = ''
+}
+
+const submitReply = async (parentComment) => {
+    if (!replyContent.value.trim()) return
+
+    try {
+        newComment.value = {
+            content: replyContent.value.trim(),
+            parent_id: parentComment.id
+        }
+
+        await addComment()
+
+        // Закрываем форму ответа
+        cancelReply()
+
+    } catch (error) {
+        console.error('Ошибка ответа на комментарий:', error)
+    }
+}
+
+const deleteComment = async (comment) => {
     if (!confirm('Удалить этот комментарий?')) return
 
     try {
         const { error } = await supabase
             .from('forum_comments')
             .delete()
-            .eq('id', commentId)
+            .eq('id', comment.id)
             .eq('author_id', user.value.id)
 
         if (error) throw error
 
-        // Удаляем комментарий локально
-        comments.value = comments.value.filter(c => c.id !== commentId)
+        // Удаляем комментарий из списка
+        comments.value = comments.value.filter(c => c.id !== comment.id)
 
     } catch (error) {
         console.error('Ошибка удаления комментария:', error)
+        alert('Не удалось удалить комментарий')
     }
 }
 
@@ -478,6 +499,7 @@ const toggleFavorite = async () => {
 
             // Обновляем счетчик локально
             post.value.favorites_count = Math.max(0, post.value.favorites_count - 1)
+            isFavorited.value = false
         } else {
             // Добавляем в избранное
             const { error } = await supabase
@@ -491,6 +513,7 @@ const toggleFavorite = async () => {
 
             // Обновляем счетчик локально
             post.value.favorites_count = (post.value.favorites_count || 0) + 1
+            isFavorited.value = true
 
             // Создаем уведомление для автора поста
             if (post.value.author_id !== user.value.id) {
@@ -502,15 +525,13 @@ const toggleFavorite = async () => {
                         sender_id: user.value.id,
                         sender_name: getFullUserName(),
                         type: 'favorite',
-                        message: `${getFullUserName()} добавил(а) ваше обсуждение в избранное`
+                        message: `${getFullUserName()} добавил(а) ваше обсуждение "${post.value.title}" в избранное`
                     })
             }
         }
-
-        isFavorited.value = !isFavorited.value
-
     } catch (error) {
         console.error('Ошибка избранного:', error)
+        alert('Не удалось обновить избранное')
     }
 }
 
@@ -529,7 +550,9 @@ const setupRealtime = () => {
             },
             (payload) => {
                 // Добавляем новый комментарий в список
-                comments.value.push(payload.new)
+                if (!comments.value.some(c => c.id === payload.new.id)) {
+                    comments.value.push(payload.new)
+                }
             }
         )
         .on(
@@ -558,7 +581,7 @@ const setupRealtime = () => {
                 table: 'forum_favorites',
                 filter: `post_id=eq.${route.params.id}`
             },
-            (payload) => {
+            async (payload) => {
                 if (payload.eventType === 'INSERT') {
                     post.value.favorites_count = (post.value.favorites_count || 0) + 1
                     if (payload.new.user_id === user.value?.id) {
@@ -577,27 +600,25 @@ const setupRealtime = () => {
 
 // Инициализация
 onMounted(() => {
-    loadPost()
     if (user.value) {
+        loadPost()
         setupRealtime()
     }
+})
+
+// Отписка при уничтожении компонента
+onUnmounted(() => {
+    supabase.removeChannel(`post-${route.params.id}-comments`)
+    supabase.removeChannel(`post-${route.params.id}-favorites`)
 })
 </script>
 
 <style scoped>
-.animate-fade-in {
-    animation: fadeIn 0.3s ease-in-out;
+.comment-item {
+    transition: all 0.2s ease;
 }
 
-@keyframes fadeIn {
-    from {
-        opacity: 0;
-        transform: translateY(10px);
-    }
-
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
+.comment-item:hover {
+    transform: translateY(-2px);
 }
 </style>

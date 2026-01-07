@@ -37,7 +37,7 @@
             <div v-else>
                 <div v-for="notification in notifications" :key="notification.id" :class="[
                     'p-4 border-b border-gray-800 hover:bg-gray-800/50 transition-colors cursor-pointer',
-                    !notification.read ? 'bg-gray-800/30' : ''
+                    !notification.is_read ? 'bg-gray-800/30' : ''
                 ]" @click="openNotification(notification)">
                     <div class="flex items-start gap-3">
                         <div :class="[
@@ -66,7 +66,7 @@
                             <p class="text-sm text-white mb-1">{{ notification.message }}</p>
                             <div class="flex justify-between items-center">
                                 <span class="text-xs text-gray-400">{{ formatDate(notification.created_at) }}</span>
-                                <span v-if="!notification.read" class="w-2 h-2 bg-orange-500 rounded-full"></span>
+                                <span v-if="!notification.is_read" class="w-2 h-2 bg-orange-500 rounded-full"></span>
                             </div>
                         </div>
                     </div>
@@ -74,9 +74,9 @@
             </div>
 
             <div class="p-4 border-t border-gray-800">
-                <button @click="showAllNotifications"
+                <button @click="clearAllNotifications"
                     class="w-full text-center text-sm text-gray-400 hover:text-white py-2">
-                    Посмотреть все уведомления
+                    Очистить все
                 </button>
             </div>
         </div>
@@ -84,18 +84,15 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
-import { onClickOutside } from '@vueuse/core'
+import { ref, onMounted, onUnmounted } from 'vue'
 
 const supabase = useSupabaseClient()
 const user = useSupabaseUser()
 
-const target = ref(null)
 const showNotifications = ref(false)
 const notifications = ref([])
 const unreadCount = ref(0)
 
-// Загрузка уведомлений
 const loadNotifications = async () => {
     if (!user.value) return
 
@@ -105,50 +102,46 @@ const loadNotifications = async () => {
             .select('*')
             .eq('user_id', user.value.id)
             .order('created_at', { ascending: false })
-            .limit(10)
+            .limit(20)
 
         if (error) throw error
 
         notifications.value = data || []
-
-        // Подсчет непрочитанных
-        unreadCount.value = notifications.value.filter(n => !n.read).length
+        unreadCount.value = notifications.value.filter(n => !n.is_read).length
     } catch (error) {
         console.error('Ошибка загрузки уведомлений:', error)
     }
 }
 
-// Отметить все как прочитанные
 const markAllAsRead = async () => {
     try {
         const { error } = await supabase
             .from('forum_notifications')
-            .update({ read: true })
+            .update({ is_read: true })
             .eq('user_id', user.value.id)
-            .eq('read', false)
+            .eq('is_read', false)
 
         if (error) throw error
 
-        notifications.value = notifications.value.map(n => ({ ...n, read: true }))
+        notifications.value = notifications.value.map(n => ({ ...n, is_read: true }))
         unreadCount.value = 0
     } catch (error) {
         console.error('Ошибка отметки уведомлений:', error)
     }
 }
 
-// Отметить одно уведомление как прочитанное
 const markAsRead = async (notificationId) => {
     try {
         const { error } = await supabase
             .from('forum_notifications')
-            .update({ read: true })
+            .update({ is_read: true })
             .eq('id', notificationId)
 
         if (error) throw error
 
         const index = notifications.value.findIndex(n => n.id === notificationId)
         if (index !== -1) {
-            notifications.value[index].read = true
+            notifications.value[index].is_read = true
             unreadCount.value = Math.max(0, unreadCount.value - 1)
         }
     } catch (error) {
@@ -156,7 +149,6 @@ const markAsRead = async (notificationId) => {
     }
 }
 
-// Открыть уведомление
 const openNotification = async (notification) => {
     await markAsRead(notification.id)
 
@@ -167,19 +159,27 @@ const openNotification = async (notification) => {
     showNotifications.value = false
 }
 
-// Показать/скрыть уведомления
+const clearAllNotifications = async () => {
+    try {
+        const { error } = await supabase
+            .from('forum_notifications')
+            .delete()
+            .eq('user_id', user.value.id)
+
+        if (error) throw error
+
+        notifications.value = []
+        unreadCount.value = 0
+    } catch (error) {
+        console.error('Ошибка очистки уведомлений:', error)
+    }
+}
+
 const toggleNotifications = () => {
     showNotifications.value = !showNotifications.value
     if (showNotifications.value) {
         loadNotifications()
     }
-}
-
-// Показать все уведомления
-const showAllNotifications = () => {
-    // Можно сделать отдельную страницу для всех уведомлений
-    navigateTo('/notifications')
-    showNotifications.value = false
 }
 
 const formatDate = (dateString) => {
@@ -200,13 +200,11 @@ const formatDate = (dateString) => {
     }
 }
 
-// Слушаем новые уведомления в реальном времени
 const setupRealtime = () => {
     if (!user.value) return
 
-    // Подписка на новые уведомления
     const channel = supabase
-        .channel('forum_notifications')
+        .channel(`notifications-${user.value.id}`)
         .on(
             'postgres_changes',
             {
@@ -217,24 +215,28 @@ const setupRealtime = () => {
             },
             (payload) => {
                 notifications.value.unshift(payload.new)
-                if (!payload.new.read) {
+                if (!payload.new.is_read) {
                     unreadCount.value += 1
                 }
             }
         )
         .subscribe()
+
+    return channel
 }
 
-// Инициализация
+let notificationsChannel = null
+
 onMounted(() => {
     if (user.value) {
         loadNotifications()
-        setupRealtime()
+        notificationsChannel = setupRealtime()
     }
 })
 
-// Закрытие по клику вне компонента
-onClickOutside(target, () => {
-    showNotifications.value = false
+onUnmounted(() => {
+    if (notificationsChannel) {
+        supabase.removeChannel(notificationsChannel)
+    }
 })
 </script>
