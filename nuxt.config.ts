@@ -1,5 +1,6 @@
 export default defineNuxtConfig({
-  modules: ['@nuxtjs/tailwindcss', '@nuxtjs/supabase', '@pinia/nuxt'],
+  modules: ['@nuxtjs/tailwindcss', '@nuxtjs/supabase', '@pinia/nuxt', '@vueuse/nuxt'],
+  css: ['~/assets/css/forum.css'],
 
   supabase: {
     redirect: false, // Отключаем автоматические редиректы
