@@ -179,7 +179,7 @@
                                         </div>
                                     </div>
                                     <p class="text-gray-300 text-lg leading-relaxed line-clamp-2 mb-4">{{ post.content
-                                        }}</p>
+                                    }}</p>
                                 </div>
 
                                 <!-- Статистика -->
@@ -241,6 +241,11 @@
 </template>
 
 <script setup>
+definePageMeta({
+    layout: false // Отключаем layout для этой страницы
+})
+
+
 const supabase = useSupabaseClient()
 const user = useSupabaseUser()
 const router = useRouter()

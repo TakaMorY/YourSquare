@@ -249,6 +249,11 @@
 </template>
 
 <script setup>
+
+definePageMeta({
+    layout: false // Отключаем layout для этой страницы
+})
+
 const route = useRoute()
 const supabase = useSupabaseClient()
 const user = useSupabaseUser()
