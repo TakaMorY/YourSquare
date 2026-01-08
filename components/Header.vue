@@ -8,20 +8,22 @@
         <div class="header-container">
             <!-- Логотип -->
             <NuxtLink to="/" class="logo">
-                <ClientOnly>
-                    <div class="logo-icon">
+                <div class="logo-icon">
+                    <!-- Обернем в ClientOnly для SSR совместимости -->
+                    <ClientOnly>
                         <svg viewBox="0 0 52 52" fill="none" xmlns="http://www.w3.org/2000/svg">
-                            <!-- Основной квадрат -->
-                            <rect x="4" y="4" width="44" height="44" rx="8" fill="currentColor" class="logo-outer" />
+                            <!-- Основной квадрат с явным цветом для iOS -->
+                            <rect x="4" y="4" width="44" height="44" rx="8" class="logo-outer" fill="#000000" />
 
-                            <!-- Белая вставка с тенью -->
-                            <rect x="12" y="12" width="28" height="28" rx="4" fill="white" class="logo-inner" />
+                            <!-- Белая вставка -->
+                            <rect x="12" y="12" width="28" height="28" rx="4" class="logo-inner" fill="#ffffff" />
 
-                            <!-- Акцентный элемент (адаптивный) -->
-                            <rect x="16" y="16" width="20" height="20" rx="2" class="logo-accent" />
+                            <!-- Акцентный элемент с явным цветом -->
+                            <rect x="16" y="16" width="20" height="20" rx="2" class="logo-accent" fill="#000000"
+                                fill-opacity="0.2" />
                         </svg>
-                    </div>
-                </ClientOnly>
+                    </ClientOnly>
+                </div>
                 <span class="logo-text">
                     <span class="logo-part logo-part-your">Твой</span>
                     <span class="logo-part logo-part-square">Квадрат</span>
@@ -144,16 +146,16 @@
                         <div class="mobile-menu-container">
                             <div class="mobile-menu-header">
                                 <NuxtLink to="/" class="mobile-logo" @click="closeMobileMenu">
-                                    <ClientOnly>
-                                        <div class="mobile-logo-icon">
+                                    <div class="mobile-logo-icon">
+                                        <ClientOnly>
                                             <svg viewBox="0 0 52 52" fill="none" xmlns="http://www.w3.org/2000/svg">
                                                 <rect x="4" y="4" width="44" height="44" rx="8" fill="#f97316" />
-                                                <rect x="12" y="12" width="28" height="28" rx="4" fill="white" />
+                                                <rect x="12" y="12" width="28" height="28" rx="4" fill="#ffffff" />
                                                 <rect x="16" y="16" width="20" height="20" rx="2" fill="#fbbf24"
-                                                    opacity="0.8" />
+                                                    fill-opacity="0.8" />
                                             </svg>
-                                        </div>
-                                    </ClientOnly>
+                                        </ClientOnly>
+                                    </div>
                                     <div class="mobile-logo-text">
                                         <span class="logo-part-your">Твой</span>
                                         <span class="logo-part-square">Квадрат</span>
@@ -207,7 +209,7 @@
                                                                     <div class="mobile-submenu-link-content">
                                                                         <span class="mobile-submenu-link-title">{{
                                                                             link.name
-                                                                        }}</span>
+                                                                            }}</span>
                                                                         <span class="mobile-submenu-link-description"
                                                                             v-if="link.description">
                                                                             {{ link.description }}
@@ -1059,7 +1061,100 @@ body {
     opacity: 0.15;
 }
 
-/* Мобильное меню */
+
+
+
+
+
+
+
+
+
+
+
+
+
+/* ФИКС ДЛЯ iOS: явные размеры SVG контейнера */
+.logo-icon,
+.mobile-logo-icon {
+    width: 40px !important;
+    height: 40px !important;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    z-index: 1;
+    flex-shrink: 0;
+}
+
+/* ФИКС: принудительный рендеринг для iOS */
+@media screen and (-webkit-min-device-pixel-ratio: 0) {
+
+    .logo-icon svg,
+    .mobile-logo-icon svg {
+        -webkit-transform: translateZ(0);
+        transform: translateZ(0);
+        backface-visibility: hidden;
+        -webkit-backface-visibility: hidden;
+    }
+}
+
+/* ФИКС: явные цвета для всех состояний */
+.logo-outer {
+    fill: #000000 !important;
+    transition: fill 0.3s ease;
+}
+
+.logo-inner {
+    fill: #ffffff !important;
+    transition: transform 0.3s ease;
+    /* Убираем фильтр для iOS - может вызывать проблемы */
+    filter: none !important;
+}
+
+.logo-accent {
+    fill: #000000 !important;
+    fill-opacity: 0.2 !important;
+    transition: all 0.3s ease;
+}
+
+/* При скролле */
+.site-header.scrolled .logo-outer {
+    fill: #f97316 !important;
+}
+
+.site-header.scrolled .logo-inner {
+    fill: #ffffff !important;
+}
+
+.site-header.scrolled .logo-accent {
+    fill: #ffffff !important;
+    fill-opacity: 0.1 !important;
+}
+
+/* Ховер эффекты */
+.logo:hover .logo-icon {
+    transform: scale(1.05);
+}
+
+.logo:hover .logo-inner {
+    transform: scale(0.98);
+}
+
+.logo:hover .logo-accent {
+    fill-opacity: 0.3 !important;
+    transform: scale(1.05);
+}
+
+.scrolled .logo:hover .logo-accent {
+    fill-opacity: 0.15 !important;
+}
+
+/* Анимации */
+.logo-icon {
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
 .mobile-logo-icon {
     transition: transform 0.3s ease;
 }
@@ -1068,29 +1163,40 @@ body {
     transform: scale(1.05);
 }
 
-/* Анимации */
-.logo-icon {
-    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-/* Явное указание цветов для мобильного меню */
-.site-header.scrolled .mobile-logo-icon rect:first-child {
-    fill: #f97316;
-}
-
-.site-header.scrolled .mobile-logo-icon rect:nth-child(2) {
-    fill: white;
-}
-
-/* Для самых старых версий iOS можно добавить */
-@media screen and (-webkit-min-device-pixel-ratio: 0) and (max-device-width: 1024px) {
+/* ФИКС для очень старых iOS */
+@supports (-webkit-touch-callout: none) {
 
     .logo-icon svg,
     .mobile-logo-icon svg {
-        -webkit-transform: translateZ(0);
-        transform: translateZ(0);
+        -webkit-transform: translate3d(0, 0, 0);
+        transform: translate3d(0, 0, 0);
     }
 }
+
+/* ФИКС: если все еще не видно, попробуйте эту комбинацию */
+.logo-icon svg,
+.mobile-logo-icon svg {
+    display: block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+}
+
+/* Для дебага: если все еще не видно, добавьте рамку */
+/* .logo-icon,
+.mobile-logo-icon {
+    border: 1px solid red;
+} */
+
+
+
+
+
+
+
+
+
+
+
 
 /* Мобильное меню */
 .mobile-logo-icon {
