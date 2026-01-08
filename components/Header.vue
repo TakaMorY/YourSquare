@@ -9,9 +9,21 @@
             <!-- Логотип -->
             <NuxtLink to="/" class="logo">
                 <div class="logo-icon">
-                    <svg viewBox="0 0 40 40" fill="none">
-                        <rect x="0" y="0" width="40" height="40" fill="currentColor" class="logo-outer" />
-                        <rect x="10" y="10" width="20" height="20" fill="white" class="logo-inner" />
+                    <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <!-- Основной квадрат -->
+                        <rect x="2" y="2" width="44" height="44" rx="8" fill="currentColor" class="logo-outer" />
+
+                        <!-- Белая вставка с тенью -->
+                        <rect x="10" y="10" width="28" height="28" rx="4" fill="white" class="logo-inner" />
+
+                        <!-- Акцентный элемент (адаптивный) -->
+                        <rect x="14" y="14" width="20" height="20" rx="2" class="logo-accent" />
+
+                        <!-- Декоративные линии (только по краям) -->
+                        <path d="M10 10 L14 10 L10 14 Z" class="logo-corner-top-left" />
+                        <path d="M38 10 L34 10 L38 14 Z" class="logo-corner-top-right" />
+                        <path d="M10 38 L14 38 L10 34 Z" class="logo-corner-bottom-left" />
+                        <path d="M38 38 L34 38 L38 34 Z" class="logo-corner-bottom-right" />
                     </svg>
                 </div>
                 <span class="logo-text">
@@ -137,9 +149,15 @@
                             <div class="mobile-menu-header">
                                 <NuxtLink to="/" class="mobile-logo" @click="closeMobileMenu">
                                     <div class="mobile-logo-icon">
-                                        <svg viewBox="0 0 40 40" fill="none">
-                                            <rect x="0" y="0" width="40" height="40" fill="#f97316" />
-                                            <rect x="10" y="10" width="20" height="20" fill="white" />
+                                        <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                            <rect x="2" y="2" width="44" height="44" rx="8" fill="#f97316" />
+                                            <rect x="10" y="10" width="28" height="28" rx="4" fill="white" />
+                                            <rect x="14" y="14" width="20" height="20" rx="2" fill="#fbbf24"
+                                                opacity="0.8" />
+                                            <path d="M10 10 L14 10 L10 14 Z" fill="white" opacity="0.3" />
+                                            <path d="M38 10 L34 10 L38 14 Z" fill="white" opacity="0.3" />
+                                            <path d="M10 38 L14 38 L10 34 Z" fill="white" opacity="0.3" />
+                                            <path d="M38 38 L34 38 L38 34 Z" fill="white" opacity="0.3" />
                                         </svg>
                                     </div>
                                     <div class="mobile-logo-text">
@@ -982,6 +1000,97 @@ body {
 
 .dropdown-arrow.rotated {
     transform: rotate(180deg);
+}
+
+
+
+
+/* Стили для логотипа */
+.logo-outer {
+    transition: fill 0.3s ease;
+}
+
+.logo-inner {
+    transition: all 0.3s ease;
+    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1));
+}
+
+.logo-accent {
+    fill: currentColor;
+    opacity: 0.2;
+    transition: all 0.3s ease;
+}
+
+/* Декоративные уголки */
+.logo-corner-top-left,
+.logo-corner-top-right,
+.logo-corner-bottom-left,
+.logo-corner-bottom-right {
+    fill: white;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+/* При скролле */
+.scrolled .logo-outer {
+    fill: #f97316 !important;
+}
+
+.scrolled .logo-inner {
+    fill: #fff;
+}
+
+.scrolled .logo-accent {
+    fill: #fff;
+    opacity: 0.1;
+}
+
+.scrolled .logo-corner-top-left,
+.scrolled .logo-corner-top-right,
+.scrolled .logo-corner-bottom-left,
+.scrolled .logo-corner-bottom-right {
+    opacity: 0.2;
+}
+
+/* Ховер эффекты */
+.logo:hover .logo-icon {
+    transform: scale(1.05);
+}
+
+.logo:hover .logo-inner {
+    transform: scale(0.98);
+}
+
+.logo:hover .logo-accent {
+    opacity: 0.3;
+    transform: scale(1.05);
+}
+
+.scrolled .logo:hover .logo-accent {
+    opacity: 0.15;
+}
+
+/* Мобильное меню */
+.mobile-logo-icon {
+    transition: transform 0.3s ease;
+}
+
+.mobile-logo:hover .mobile-logo-icon {
+    transform: scale(1.05);
+}
+
+/* Анимации */
+.logo-icon {
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Для темной темы (при скролле) */
+.site-header.scrolled .logo-outer {
+    fill: #f97316;
+}
+
+.site-header.scrolled .logo-inner {
+    fill: white;
 }
 
 /* Меню профиля */
